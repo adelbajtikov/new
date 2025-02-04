@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <title>Профиль пользователя</title>
+</head>
+<body>
+            <!-- Header -->
+            <header class="header">
+                <div class="header-container">
+                    <!-- Логотип -->
+                    <div class="logo">
+                        <img src="/static/images/logo.png" alt="Alterra" class="logo-img">
+                        <span class="logo-text">Alterra</span>
+                    </div>
+        
+                    <!-- Навигация -->
+                    <nav class="nav">
+                        <a href="{{url_for('home')}}">Пожертвования</a>
+                        <a href="{{ url_for('volunteering') }}">Волонтёрства</a>
+                        <a href="{{url_for('organizations')}}">Организации</a>
+                    </nav>
+        
+                    <!-- Аватар пользователя -->
+                    <div class="user-profile">
+                        {% if session.get('user_id') %}
+                            <a href="{{ url_for('profile') }}">
+                                <img src="{{ user['avatar'] if user['avatar'] else '/static/images/default_avatar.png' }}" 
+                                     alt="{{ session['username'] }}" class="user-avatar">
+                            </a>
+                            <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
+                        {% else %}
+                            <a href="{{ url_for('login') }}">
+                                <img src="/static/images/user.png" alt="Гость" class="user-avatar">
+                            </a>
+                        {% endif %}
+                    </div>
+                    
+                </div>
+            </header>
+            <!DOCTYPE html>
+            <html lang="ru">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Профиль</title>
+                <link rel="stylesheet" href="/static/css/styles.css">
+            </head>
+            <body>
+                <div class="profile-container">
+                    <h1>Профиль пользователя</h1>
+                    <img src="{{ user.avatar if user.avatar else '/static/images/default_avatar.png' }}" class="profile-avatar">
+                    <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
+                    <p><strong>Дата регистрации:</strong> {{ user.created_at }}</p>
+                    <p><strong>Ваш баланс:</strong> ${{ total_balance }}</p>
+            
+                    <a href="{{ url_for('create_campaign') }}" class="btn">Создать публикацию</a>
+            
+                    <h2>Ваши кампании:</h2>
+                    {% if campaigns %}
+                        <ul>
+                            {% for campaign in campaigns %}
+                            <li class="campaign-card">
+                                <img src="{{ campaign.image_url }}" alt="{{ campaign.title }}" class="campaign-image">
+                                <div class="campaign-content">
+                                    <h3>{{ campaign.title }}</h3>
+                                    <p>{{ campaign.description }}</p>
+                                    <div class="progress-bar">
+                                        <div style="width: {{ (campaign.collected / campaign.goal) * 100 }}%;"></div>
+                                    </div>
+                                    <p>Собрано: ${{ campaign.collected }} из ${{ campaign.goal }}</p>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>Вы ещё не создали ни одной кампании.</p>
+                    {% endif %}
+            
+                    <!-- Вывод карт пользователя -->
+                    <h2>Ваши карты:</h2>
+                    {% if cards and cards|length > 0 %}
+                        <ul>
+                            {% for card in cards %}
+                            <li>
+                                <strong>{{ card.brand }}</strong> **** **** **** {{ card.last4 }} 
+                                ({{ card.exp_month }}/{{ card.exp_year }})
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>У вас нет привязанных карт.</p>
+                    {% endif %}
+                    
+                    <h2>Мои подтверждённые волонтёрские программы</h2>
+                    {% if confirmed_opportunities %}
+                        <ul>
+                            {% for opportunity in confirmed_opportunities %}
+                                <li>{{ opportunity.title }} (завершено)</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>Вы пока не подтвердили участие ни в одной программе.</p>
+                    {% endif %}
+                    <h2>Ваши волонтёрские кампании</h2>
+                    {% for opportunity in user_opportunities %}
+                        <h3>{{ opportunity.title }}</h3>
+                        <p>{{ opportunity.description }}</p>
+                        
+                        <h4>Участники:</h4>
+                        {% if opportunity.participants %}
+                            <ul>
+                                {% for participant in opportunity.participants %}
+                                    <li>
+                                        {{ participant.username }} 
+                                        {% if participant.status == "pending" %}
+                                            <button class="btn confirm-btn" data-user-id="{{ participant.user_id }}" data-opportunity-id="{{ opportunity.id }}">
+                                                Подтвердить участие
+                                            </button>
+                                        {% else %}
+                                            (участие подтверждено)
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>Пока нет участников.</p>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <script>
+                        document.querySelectorAll(".confirm-btn").forEach(button => {
+                            button.addEventListener("click", function() {
+                                const userId = this.dataset.userId;
+                                const opportunityId = this.dataset.opportunityId;
+                    
+                                fetch(`/confirm_volunteer/${userId}/${opportunityId}`, { method: "POST" })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        alert(data.message);
+                                        location.reload();
+                                    });
+                            });
+                        });
+                    </script>
+                    <h2>Мои подтверждённые волонтёрские программы</h2>
+                    {% if confirmed_opportunities %}
+                        <ul>
+                            {% for opportunity in confirmed_opportunities %}
+                                <li>{{ opportunity.title }} (завершено)</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>Вы пока не подтвердили участие ни в одной программе.</p>
+                    {% endif %}
+                    <h2>Ваши волонтерские программы:</h2>
+                    {% if user_opportunities %}
+                        <ul>
+                            {% for opportunity in user_opportunities %}
+                            <li>
+                                <h3>{{ opportunity.title }}</h3>
+                                <p>{{ opportunity.description }}</p>
+                                <p><strong>Участников:</strong> {{ opportunity.participant_count }}</p>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>Вы еще не создали ни одной волонтерской программы.</p>
+                    {% endif %}
+                    
+                    <a href="{{ url_for('create_volunteering') }}" class="btn">Создать программу</a>
+                    
+                </div>
+            </body>
+            </html>
+        
+
+</body>
+</html>

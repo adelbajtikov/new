@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пожертвовать</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <!-- Header -->
+        <header class="header">
+            <div class="header-container">
+                <!-- Логотип -->
+                <div class="logo">
+                    <img src="/static/images/logo.png" alt="Alterra" class="logo-img">
+                    <span class="logo-text">Alterra</span>
+                </div>
+    
+                <!-- Навигация -->
+                <nav class="nav">
+                    <a href="{{url_for('home')}}">Пожертвования</a>
+                    <a href="{{ url_for('volunteering') }}">Волонтёрства</a>
+                    <a href="{{url_for('organizations')}}">Организации</a>
+                </nav>
+    
+                <!-- Аватар пользователя -->
+                <div class="user-profile">
+                    <img src="/static/images/profile.jpg" alt="Профиль" class="user-avatar">
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="donate-page">
+            <div class="donate-container">
+                <h1>Пожертвовать на кампанию: {{ campaign['title'] }}</h1>
+                <p>{{ campaign['description'] }}</p>
+                <div class="progress-bar" style="width: 600px;">
+                    <div style="width: {{ (campaign['collected'] / campaign['goal']) * 100 }}%;"></div>
+                </div>
+                <p>Собрано: ${{ campaign['collected'] }} из ${{ campaign['goal'] }}</p>
+
+                <form action="" method="POST" class="donate-form">
+                    <label for="name">Ваше имя:</label>
+                    <input type="text" id="name" name="name" placeholder="Введите ваше имя" required>
+
+                    <label for="amount">Сумма пожертвования ($):</label>
+                    <input type="number" id="amount" name="amount" placeholder="Введите сумму" min="1" required>
+
+                    <label for="message">Сообщение (необязательно):</label>
+                    <textarea id="message" name="message" placeholder="Ваше сообщение"></textarea>
+
+                    <button type="submit" class="btn">Пожертвовать</button>
+                </form>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-container">
+                <div class="footer-logo">
+                    <span>Alterra</span>
+                </div>
+                <div class="footer-info">
+                    <p>Контакты: +773-34-64-64</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

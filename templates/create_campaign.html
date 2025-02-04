@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создать публикацию</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="form-container">
+        <h1>Создать новую кампанию</h1>
+        <form method="POST" enctype="multipart/form-data">
+            <label for="title">Название кампании:</label>
+            <input type="text" id="title" name="title" placeholder="Введите название" required>
+
+            <label for="description">Описание:</label>
+            <textarea id="description" name="description" placeholder="Введите описание" required></textarea>
+
+            <label for="goal">Цель сбора (в $):</label>
+            <input type="number" id="goal" name="goal" placeholder="Введите сумму цели" min="1" required>
+
+            <label for="days_left">Количество дней:</label>
+            <input type="number" id="days_left" name="days_left" placeholder="Введите количество дней" min="1" required>
+
+            <label for="image">Загрузить изображение:</label>
+            <input type="file" id="image" name="image" accept=".png, .jpg, .jpeg, .gif" required>
+
+            <button type="submit" class="btn">Создать</button>
+        </form>
+    </div>
+</body>
+</html>

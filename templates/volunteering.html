@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Волонтерские Акции</title>
+    <link rel="stylesheet" href="/static/css/volunteer.css">
+    <script>
+        function confirmParticipation(opportunityId) {
+            const confirmation = confirm("Вы уверены, что хотите участвовать в этой волонтерской акции?");
+            if (confirmation) {
+                fetch(`/participate/${opportunityId}`, { method: "POST" })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert("Вы успешно зарегистрировались на участие!");
+                            location.reload();
+                        } else {
+                            alert("Ошибка: " + data.error);
+                        }
+                    });
+            }
+        }
+    </script>
+</head>
+<body>
+    <!-- Хедер -->
+    <header class="header">
+        <div class="header-container">
+            <!-- Логотип -->
+            <div class="logo">
+                <img src="/static/images/logo.png" alt="Alterra" class="logo-img">
+                <span class="logo-text">Alterra</span>
+            </div>
+
+            <!-- Навигация -->
+            <nav class="nav">
+                <a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Пожертвования</a>
+                <a href="{{ url_for('volunteering') }}" class="{% if request.endpoint == 'volunteering' %}active{% endif %}">Волонтёрства</a>
+                <a href="{{ url_for('organizations') }}" class="{% if request.endpoint == 'organizations' %}active{% endif %}">Организации</a>
+            </nav>
+
+            <!-- Аватар пользователя -->
+            <div class="user-profile">
+                {% if session.get('user_id') %}
+                    <a href="{{ url_for('profile') }}">
+                        <img src="{{ user['avatar'] if user['avatar'] else '/static/images/default_avatar.png' }}" 
+                             alt="{{ session['username'] }}" class="user-avatar">
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">
+                        <img src="/static/images/user.png" alt="Гость" class="user-avatar">
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Основной контент -->
+    <div class="container">
+        <main>
+            {% for opportunity in opportunities %}
+            <div class="volunteering-card">
+                <img src="{{ opportunity['image_url'] }}" alt="{{ opportunity['title'] }}">
+                <div class="card-content">
+                    <h2>{{ opportunity['title'] }}</h2>
+                    <p>{{ opportunity['description'] }}</p>
+                    <button class="btn" onclick="confirmParticipation({{ opportunity['id'] }})">
+                        Участвовать
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </main>
+    </div>
+</body>
+</html>

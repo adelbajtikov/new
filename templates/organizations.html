@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Благотворительные организации</title>
+    <link rel="stylesheet" href="/static/css/organizations.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <!-- Логотип -->
+            <div class="logo">
+                <img src="/static/images/logo.png" alt="Alterra" class="logo-img">
+                <span class="logo-text">Alterra</span>
+            </div>
+
+            <!-- Навигация -->
+            <nav class="nav">
+                <a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Пожертвования</a>
+                <a href="{{ url_for('volunteering') }}" class="{% if request.endpoint == 'volunteering' %}active{% endif %}">Волонтёрства</a>
+                <a href="{{ url_for('organizations') }}" class="{% if request.endpoint == 'organizations' %}active{% endif %}">Организации</a>
+            </nav>
+
+            <!-- Аватар пользователя -->
+            <div class="user-profile">
+                {% if session.get('user_id') %}
+                    <a href="{{ url_for('profile') }}">
+                        <img src="{{ user['avatar'] if user['avatar'] else '/static/images/default_avatar.png' }}" 
+                             alt="{{ session['username'] }}" class="user-avatar">
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">
+                        <img src="/static/images/user.png" alt="Гость" class="user-avatar">
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+    <main class="container">
+        <div class="organizations-grid">
+            {% for organization in organizations %}
+            <div class="organization-card">
+                <img src="{{ organization['image_url'] }}" alt="{{ organization['name'] }}">
+                <div class="card-content">
+                    <h2>{{ organization['name'] }}</h2>
+                    <p>{{ organization['description'] }}</p>
+                    <a href="{{ organization['join_url'] }}" target="_blank" class="btn">Присоединиться</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+</body>
+</html>

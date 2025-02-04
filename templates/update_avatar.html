@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обновить аватарку</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="form-container">
+        <h1>Обновить аватарку</h1>
+        <form method="POST" enctype="multipart/form-data">
+            <label for="avatar">Выберите файл для загрузки:</label>
+            <input type="file" id="avatar" name="avatar" accept=".png, .jpg, .jpeg, .gif" required>
+            <button type="submit" class="btn">Обновить аватарку</button>
+        </form>
+        <a href="{{ url_for('profile') }}" class="btn btn-secondary">Вернуться в профиль</a>
+    </div>
+</body>
+</html>

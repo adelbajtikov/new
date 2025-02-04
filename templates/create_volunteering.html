@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создать волонтерскую программу</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <img src="/static/images/logo.png" alt="Alterra" class="logo-img">
+                <span class="logo-text">Alterra</span>
+            </div>
+            <nav class="nav">
+                <a href="{{ url_for('home') }}">Пожертвования</a>
+                <a href="{{ url_for('volunteering') }}">Волонтёрства</a>
+                <a href="{{ url_for('organizations') }}">Организации</a>
+            </nav>
+            <div class="user-profile">
+                {% if session.get('user_id') %}
+                    <a href="{{ url_for('profile') }}">
+                        <img src="{{ user['avatar'] if user['avatar'] else '/static/images/default_avatar.png' }}" class="user-avatar">
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">
+                        <img src="/static/images/user.png" alt="Гость" class="user-avatar">
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1>Создать волонтерскую программу</h1>
+        <form action="{{ url_for('create_volunteering') }}" method="POST" enctype="multipart/form-data">
+            <label for="title">Название:</label>
+            <input type="text" name="title" required>
+
+            <label for="description">Описание:</label>
+            <textarea name="description" required></textarea>
+
+            <label for="button_text">Текст кнопки (по умолчанию "Участвовать"):</label>
+            <input type="text" name="button_text" placeholder="Участвовать">
+
+            <label for="image">Загрузить изображение:</label>
+            <input type="file" name="image" required>
+
+            <button type="submit" class="btn">Создать программу</button>
+        </form>
+    </div>
+</body>
+</html>
