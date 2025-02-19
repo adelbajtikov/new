@@ -1,16 +1,18 @@
 import sqlite3
 
-DATABASE = 'database/donations.db'
+def confirm_all_volunteers():
+    conn = sqlite3.connect('database/donations.db')  # Подключение к БД
+    cursor = conn.cursor()
 
-conn = sqlite3.connect(DATABASE)
-cursor = conn.cursor()
+    # ✅ Обновляем статус всех участников на 'confirmed'
+    a = cursor.execute("SELECT * FROM volunteer_participants")
 
-# Добавляем колонку status, если её нет
-cursor.execute("""
-    ALTER TABLE volunteering_opportunities ADD COLUMN status TEXT DEFAULT 'active'
-""")
+    # ✅ Сохраняем изменения и закрываем соединение
+    conn.commit()
+    conn.close()
 
-conn.commit()
-conn.close()
+    print(a)
+    return a
 
-print("Колонка status добавлена в volunteering_opportunities.")
+# 🔥 Запускаем функцию
+confirm_all_volunteers()

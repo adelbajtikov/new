@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Создать волонтерскую программу</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/create_volunteering.css">
 </head>
 <body>
     <header class="header">
@@ -41,6 +41,9 @@
 
             <label for="description">Описание:</label>
             <textarea name="description" required></textarea>
+
+            <label for="date">Дата проведения:</label>  <!-- ✅ Добавлено поле даты -->
+            <input type="date" name="date" required>
 
             <label for="button_text">Текст кнопки (по умолчанию "Участвовать"):</label>
             <input type="text" name="button_text" placeholder="Участвовать">

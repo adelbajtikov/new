@@ -1,182 +1,307 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/css/styles.css">
     <title>Профиль пользователя</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <body>
-            <!-- Header -->
-            <header class="header">
-                <div class="header-container">
-                    <!-- Логотип -->
-                    <div class="logo">
-                        <img src="/static/images/logo.png" alt="Alterra" class="logo-img">
-                        <span class="logo-text">Alterra</span>
-                    </div>
+
+    <!-- 🔹 HEADER -->
+    <header class="header">
+        <div class="header-container">
+            <!-- Логотип -->
+            <div class="logo">
+                <img src="/static/images/logo.png" alt="Alterra" class="logo-img">
+                <span class="logo-text">Alterra</span>
+            </div>
+
+            <!-- Навигация -->
+            <nav class="nav">
+                <a href="{{ url_for('home') }}">Пожертвования</a>
+                <a href="{{ url_for('volunteering') }}">Волонтёрства</a>
+                <a href="{{ url_for('organizations') }}">Организации</a>
+            </nav>
+
+            <!-- Аватар и выход -->
+            <div class="user-profile">
+                {% if session.get('user_id') %}
+                    <a href="{{ url_for('profile') }}">
+                        <img src="{{ user['avatar'] if user['avatar'] else '/static/images/default_avatar.png' }}" class="user-avatar">
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">
+                        <img src="/static/images/user.png" alt="Гость" class="user-avatar">
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- 🔹 PROFILE CONTENT -->
+    <div class="profile-container">
+        <h1>Профиль пользователя</h1>
+
+        <!-- ✅ 1. Аватар и смена фото -->
+        <div class="profile-avatar-container">
+            <img src="{{ user.avatar if user.avatar else '/static/images/default_avatar.png' }}" class="profile-avatar">
+            <form action="{{ url_for('update_avatar') }}" method="POST" enctype="multipart/form-data">
+                <input type="file" name="avatar" accept=".png, .jpg, .jpeg, .gif" required>
+                <button type="submit" class="btn">Обновить фото</button>
+            </form>
+        </div>
+
+        <!-- ✅ 2. Основная информация -->
+        <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
+        <p><strong>Ваши баллы:</strong> {{ user.points if user.points else 0 }} 🏆</p>
         
-                    <!-- Навигация -->
-                    <nav class="nav">
-                        <a href="{{url_for('home')}}">Пожертвования</a>
-                        <a href="{{ url_for('volunteering') }}">Волонтёрства</a>
-                        <a href="{{url_for('organizations')}}">Организации</a>
-                    </nav>
-        
-                    <!-- Аватар пользователя -->
-                    <div class="user-profile">
-                        {% if session.get('user_id') %}
-                            <a href="{{ url_for('profile') }}">
-                                <img src="{{ user['avatar'] if user['avatar'] else '/static/images/default_avatar.png' }}" 
-                                     alt="{{ session['username'] }}" class="user-avatar">
-                            </a>
-                            <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
-                        {% else %}
-                            <a href="{{ url_for('login') }}">
-                                <img src="/static/images/user.png" alt="Гость" class="user-avatar">
-                            </a>
-                        {% endif %}
+        <a href="{{ url_for('create_campaign') }}" class="btn">Создать кампанию</a>
+
+        <h2>Ваши кампании</h2>
+        {% if campaigns %}
+            <div class="campaign-container">
+                {% for campaign in campaigns %}
+                <div class="campaign-card">
+                    <img src="{{ campaign.image_url }}" alt="{{ campaign.title }}" class="campaign-image">
+                    <div class="campaign-content">
+                        <h3>{{ campaign.title }}</h3>
+                        <p>{{ campaign.description[:100] }}...</p> <!-- Короткое описание -->
+                        <p>Собрано: ${{ campaign.collected }} / ${{ campaign.goal }}</p>
+                        <div class="progress-bar">
+                            <div style="width: {{ (campaign.collected / campaign.goal) * 100 }}%;"></div>
+                        </div>
+                        <a href="{{ url_for('donate', campaign_id=campaign['id']) }}" class="btn">Пожертвовать</a>
                     </div>
-                    
                 </div>
-            </header>
-            <!DOCTYPE html>
-            <html lang="ru">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Профиль</title>
-                <link rel="stylesheet" href="/static/css/styles.css">
-            </head>
-            <body>
-                <div class="profile-container">
-                    <h1>Профиль пользователя</h1>
-                    <img src="{{ user.avatar if user.avatar else '/static/images/default_avatar.png' }}" class="profile-avatar">
-                    <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
-                    <p><strong>Дата регистрации:</strong> {{ user.created_at }}</p>
-                    <p><strong>Ваш баланс:</strong> ${{ total_balance }}</p>
-            
-                    <a href="{{ url_for('create_campaign') }}" class="btn">Создать публикацию</a>
-            
-                    <h2>Ваши кампании:</h2>
-                    {% if campaigns %}
-                        <ul>
-                            {% for campaign in campaigns %}
-                            <li class="campaign-card">
-                                <img src="{{ campaign.image_url }}" alt="{{ campaign.title }}" class="campaign-image">
-                                <div class="campaign-content">
-                                    <h3>{{ campaign.title }}</h3>
-                                    <p>{{ campaign.description }}</p>
-                                    <div class="progress-bar">
-                                        <div style="width: {{ (campaign.collected / campaign.goal) * 100 }}%;"></div>
-                                    </div>
-                                    <p>Собрано: ${{ campaign.collected }} из ${{ campaign.goal }}</p>
-                                </div>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>Вы ещё не создали ни одной кампании.</p>
-                    {% endif %}
-            
-                    <!-- Вывод карт пользователя -->
-                    <h2>Ваши карты:</h2>
-                    {% if cards and cards|length > 0 %}
-                        <ul>
-                            {% for card in cards %}
-                            <li>
-                                <strong>{{ card.brand }}</strong> **** **** **** {{ card.last4 }} 
-                                ({{ card.exp_month }}/{{ card.exp_year }})
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>У вас нет привязанных карт.</p>
-                    {% endif %}
-                    
-                    <h2>Мои подтверждённые волонтёрские программы</h2>
-                    {% if confirmed_opportunities %}
-                        <ul>
-                            {% for opportunity in confirmed_opportunities %}
-                                <li>{{ opportunity.title }} (завершено)</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>Вы пока не подтвердили участие ни в одной программе.</p>
-                    {% endif %}
-                    <h2>Ваши волонтёрские кампании</h2>
-                    {% for opportunity in user_opportunities %}
-                        <h3>{{ opportunity.title }}</h3>
-                        <p>{{ opportunity.description }}</p>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>Вы ещё не создали ни одной кампании.</p>
+        {% endif %}
+        <!-- 🔹 Кнопка "История платежей" -->
+        <button class="btn" onclick="openPaymentsModal()">История платежей</button>
+
+        <!-- 🔹 Модальное окно "История платежей" -->
+        <div id="paymentsModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closePaymentsModal()">&times;</span>
+                <h2>История платежей</h2>
+                
+                <!-- 🔹 Контейнер со скроллом -->
+                <div class="payments-container">
+                    <table class="payments-table">
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Кампания</th>
+                                <th>Сумма ($)</th>
+                                <th>Сообщение</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentsList">
+                            <!-- 🛠️ Данные будут загружены через JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🔹 КНОПКА СОЗДАНИЯ ВОЛОНТЁРСКОЙ АКЦИИ -->
+        <a href="{{ url_for('create_volunteering') }}" class="btn create-btn">Создать волонтёрскую акцию</a>
+        
+
+        <!-- ✅ 4. Участие в волонтёрских программах -->
+        <h2>Ваши волонтёрские инициативы</h2>
+
+        {% if volunteer_initiatives %}
+            <div class="volunteer-grid">
+                {% for initiative in volunteer_initiatives %}
+                <div class="volunteer-card">
+                    <div class="volunteer-content">
+                        <h3>{{ initiative.title }}</h3>
+                        <p>{{ initiative.description[:120] }}...</p>
+                        <p><strong>Участников:</strong> {{ initiative.participant_count }}</p>
                         
-                        <h4>Участники:</h4>
-                        {% if opportunity.participants %}
-                            <ul>
-                                {% for participant in opportunity.participants %}
-                                    <li>
-                                        {{ participant.username }} 
-                                        {% if participant.status == "pending" %}
-                                            <button class="btn confirm-btn" data-user-id="{{ participant.user_id }}" data-opportunity-id="{{ opportunity.id }}">
-                                                Подтвердить участие
-                                            </button>
-                                        {% else %}
-                                            (участие подтверждено)
-                                        {% endif %}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        {% else %}
-                            <p>Пока нет участников.</p>
-                        {% endif %}
-                    {% endfor %}
-                    
-                    <script>
-                        document.querySelectorAll(".confirm-btn").forEach(button => {
-                            button.addEventListener("click", function() {
-                                const userId = this.dataset.userId;
-                                const opportunityId = this.dataset.opportunityId;
-                    
-                                fetch(`/confirm_volunteer/${userId}/${opportunityId}`, { method: "POST" })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        alert(data.message);
-                                        location.reload();
-                                    });
-                            });
-                        });
-                    </script>
-                    <h2>Мои подтверждённые волонтёрские программы</h2>
-                    {% if confirmed_opportunities %}
-                        <ul>
-                            {% for opportunity in confirmed_opportunities %}
-                                <li>{{ opportunity.title }} (завершено)</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>Вы пока не подтвердили участие ни в одной программе.</p>
-                    {% endif %}
-                    <h2>Ваши волонтерские программы:</h2>
-                    {% if user_opportunities %}
-                        <ul>
-                            {% for opportunity in user_opportunities %}
-                            <li>
-                                <h3>{{ opportunity.title }}</h3>
-                                <p>{{ opportunity.description }}</p>
-                                <p><strong>Участников:</strong> {{ opportunity.participant_count }}</p>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>Вы еще не создали ни одной волонтерской программы.</p>
-                    {% endif %}
-                    
-                    <a href="{{ url_for('create_volunteering') }}" class="btn">Создать программу</a>
-                    
+                        <!-- 🔹 КНОПКА "ПОСМОТРЕТЬ УЧАСТНИКОВ" -->
+                        <button class="btn view-participants" onclick="openParticipantsModal({{ initiative.id }})">
+                            Посмотреть участников
+                        </button>
+                    </div>
                 </div>
-            </body>
-            </html>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-volunteer-projects">
+                <p>Вы ещё не создали ни одной волонтёрской инициативы.</p>
+            </div>
+        {% endif %}
         
+        <!-- 🔹 МОДАЛЬНОЕ ОКНО ДЛЯ СПИСКА УЧАСТНИКОВ -->
+        <div id="participantsModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeParticipantsModal()">&times;</span>
+                <h2>Список участников</h2>
+                <ul id="participantsList"></ul>
+            </div>
+        </div>
+    
+        <h2>Мои участия в волонтерских акциях</h2>
+        {% if participated_opportunities %}
+            <div class="volunteering-block">
+                {% for opportunity in participated_opportunities %}
+                <div class="volunteer-card">
+                    <div class="volunteer-header">
+                        <h3>{{ opportunity.title }}</h3>
+                        <p class="volunteer-date"><strong>Дата:</strong> {{ opportunity.date }}</p>
+                    </div>
+                    <p>{{ opportunity.description }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-opportunities">
+                <p>Вы пока не участвовали в волонтёрских акциях.</p>
+            </div>
+        {% endif %}
+        
+        <h2>Рекомендуемые кампании</h2>
+        <div id="recommended-campaigns"></div>
+
+        <!-- ✅ 6. Рекомендованные кампании -->
+        
+        <h2>Рекомендованные волонтёрские акции</h2>
+        <div id="recommended-volunteering"></div>
+        
+
+        <script>
+        function loadRecommendations() {
+            let campaignId = {{ campaigns[0].id if campaigns else 'null' }};
+            if (campaignId === 'null') return; // Если нет кампаний — не запрашивать рекомендации
+
+            fetch(`/recommend_campaigns/${campaignId}`)
+                .then(response => response.json())
+                .then(data => {
+                    let container = document.getElementById("recommended-campaigns");
+                    container.innerHTML = "";
+                    if (data.length > 0) {
+                        data.forEach(campaign => {
+                            let campaignCard = `
+                                <div class="campaign-card">
+                                    <h3>${campaign.title}</h3>
+                                    <p>${campaign.description}</p>
+                                    <a href="/donate/${campaign.id}" class="btn">Подробнее</a>
+                                </div>
+                            `;
+                            container.innerHTML += campaignCard;
+                        });
+                    } else {
+                        container.innerHTML = "<p>Нет рекомендуемых кампаний.</p>";
+                    }
+                })
+                .catch(error => console.error("Ошибка при загрузке рекомендаций:", error));
+        }
+
+        // 🔹 Рекомендации для волонтёрских программ
+        function loadRecommendedVolunteering() {
+            let opportunityId = {{ participated_opportunities[0].id if participated_opportunities else 'null' }};
+            if (opportunityId === 'null') return; // Если нет участий, не делать запрос
+
+            fetch(`/recommend_volunteering/${opportunityId}`)
+                .then(response => response.json())
+                .then(data => {
+                    let container = document.getElementById("recommended-volunteering");
+                    container.innerHTML = "";
+                    if (data.length > 0) {
+                        data.forEach(opportunity => {
+                            let opportunityCard = `
+                                <div class="volunteer-card">
+                                    <h3>${opportunity.title}</h3>
+                                    <p>${opportunity.description}</p>
+                                    <a href="/volunteering/${opportunity.id}" class="btn">Подробнее</a>
+                                </div>
+                            `;
+                            container.innerHTML += opportunityCard;
+                        });
+                    } else {
+                        container.innerHTML = "<p>Нет рекомендуемых акций.</p>";
+                    }
+                })
+                .catch(error => console.error("Ошибка при загрузке волонтёрских рекомендаций:", error));
+        }
+        function openDonationsModal() {
+        document.getElementById("donationsModal").style.display = "flex";
+        }
+
+        function closeDonationsModal() {
+            document.getElementById("donationsModal").style.display = "none";
+        }
+
+        // Запускаем загрузку рекомендаци
+        loadRecommendations();
+        loadRecommendedVolunteering();
+        function openPaymentsModal() {
+            fetch('/get_payment_history')  // ⚡ Запрашиваем историю платежей
+                .then(response => response.json())
+                .then(data => {
+                    let paymentsList = document.getElementById("paymentsList");
+                    paymentsList.innerHTML = ""; // Очищаем список перед загрузкой новых данных
+
+                    if (data.length > 0) {
+                        data.forEach(payment => {
+                            let row = `
+                                <tr>
+                                    <td>${payment.date}</td>
+                                    <td>${payment.campaign_title}</td>
+                                    <td>$${payment.amount}</td>
+                                    <td>${payment.message || '-'}</td>
+                                </tr>
+                            `;
+                            paymentsList.innerHTML += row;
+                        });
+                    } else {
+                        paymentsList.innerHTML = "<tr><td colspan='4'>История платежей пуста</td></tr>";
+                    }
+
+                    document.getElementById("paymentsModal").style.display = "block"; // Открываем окно
+                })
+                .catch(error => console.error("Ошибка при загрузке платежей:", error));
+        }
+
+        // 🔹 Закрытие модального окна
+        function closePaymentsModal() {
+            document.getElementById("paymentsModal").style.display = "none";
+        }
+        function openParticipantsModal(opportunityId) {
+        fetch(`/get_participants/${opportunityId}`)
+            .then(response => response.json())
+            .then(data => {
+                let participantsList = document.getElementById("participantsList");
+                participantsList.innerHTML = ""; // Очистка списка перед добавлением новых данных
+
+                if (data.length > 0) {
+                    data.forEach(participant => {
+                        let listItem = document.createElement("li");
+                        listItem.textContent = participant.username;
+                        participantsList.appendChild(listItem);
+                    });
+                } else {
+                    participantsList.innerHTML = "<li>Пока нет участников</li>";
+                }
+
+                document.getElementById("participantsModal").style.display = "block";
+            })
+            .catch(error => console.error("Ошибка при загрузке участников:", error));
+    }
+
+    function closeParticipantsModal() {
+        document.getElementById("participantsModal").style.display = "none";
+    }
+
+
+    </script>
+    </div>
 
 </body>
 </html>

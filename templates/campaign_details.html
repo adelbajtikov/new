@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ campaign.title }}</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-container">
+                <div class="logo">
+                    <img src="/static/images/logo.png" alt="Alterra" class="logo-img">
+                    <span class="logo-text">Alterra</span>
+                </div>
+                <nav class="nav">
+                    <a href="{{ url_for('home') }}">Пожертвования</a>
+                    <a href="{{ url_for('volunteering') }}">Волонтёрства</a>
+                    <a href="{{ url_for('organizations') }}">Организации</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="campaign-details">
+            <h1>{{ campaign.title }}</h1>
+            <img src="{{ campaign.image_url }}" alt="{{ campaign.title }}" class="campaign-image">
+            <p>{{ campaign.description }}</p>
+            <p><strong>Собрано:</strong> ${{ campaign.collected }} из ${{ campaign.goal }}</p>
+
+            <a href="{{ url_for('donate', campaign_id=campaign.id) }}" class="btn">Пожертвовать</a>
+        </main>
+    </div>
+</body>
+</html>

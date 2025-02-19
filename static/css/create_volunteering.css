@@ -1,0 +1,326 @@
+/* 🔹 ОБЩИЕ СТИЛИ */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+        /* 🔹 Общие стили */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2e004b; /* Тёмно-фиолетовый */
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            margin: 0 auto;
+        }
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #6a1b9a;
+            margin-bottom: 20px;
+        }
+
+        .btn-secondary {
+            background-color: #ddd;
+            color: #333;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background-color: #bbb;
+        }
+
+        /* Header */
+        /* Основной стиль для хедера */
+        .header {
+            background-color: #fff;
+            border-bottom: 2px solid #e0e0e0;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Контейнер для хедера */
+        .header-container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Логотип */
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            height: 30px;
+            margin-right: 10px;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: bold;
+            color: #6a1b9a;
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .logout-link {
+            color: red;
+            text-decoration: none;
+            margin-left: 10px;
+        }
+
+        /* Навигация */
+        .nav {
+            display: flex;
+            gap: 50px;
+            margin-left: 450px;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #000; /* стандартный цвет ссылок */
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .nav a:hover {
+            background-color: #f0f0f0; /* цвет при наведении */
+        }
+
+        .nav a.active {
+            border: 1px solid purple;/* цвет фона для активного элемента */  
+            font-weight: bold;
+        }
+        /* Аватар пользователя */
+        .user-profile {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #6a1b9a;
+        }
+
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #6a1b9a;
+        }
+
+
+/* 🔹 КНОПКИ */
+.btn {
+    background-color: #ffd700;
+    color: #2e004b;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+.btn:hover {
+    background-color: #ffcc00;
+}
+
+/* 🔹 СТИЛЬ ДЛЯ ФОРМЫ */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: left;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Поля ввода */
+input, textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 6px;
+    border: none;
+    font-size: 16px;
+    background: #fff;
+    color: #2e004b;
+    transition: 0.3s;
+}
+
+input:focus, textarea:focus {
+    outline: 2px solid #ffd700;
+}
+
+/* 🔹 КАРТОЧКИ КАМПАНИЙ */
+.campaign-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 колонки */
+    gap: 20px;
+    padding: 20px;
+}
+
+.campaign-card {
+    background: #5a0095;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s;
+}
+
+.campaign-card:hover {
+    transform: scale(1.05);
+}
+
+.campaign-image {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.campaign-content {
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* Прогресс-бар */
+.progress-bar {
+    width: 100%;
+    background: #ddd;
+    height: 8px;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
+.progress-bar div {
+    height: 8px;
+    background: #ffd700;
+    border-radius: 5px;
+}
+
+/* 🔹 СОЗДАНИЕ ВОЛОНТЁРСКОЙ ПРОГРАММЫ */
+.container {
+    background: #4e007b;
+    padding: 30px;
+    border-radius: 12px;
+    width: 50%;
+    margin: 80px auto;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+/* Заголовок */
+.container h1 {
+    color: #ffd700;
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+/* Стили для загрузки файла */
+input[type="file"] {
+    background: #fff;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+/* 🔹 ПОДВАЛ */
+.footer {
+    background: #3e005f;
+    padding: 20px;
+    margin-top: 30px;
+    text-align: center;
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.footer-logo-img {
+    height: 30px;
+    margin-right: 10px;
+}
+
+.footer-logo-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffd700;
+}
+
+.footer-info p {
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+/* 🔹 МЕДИА-ЗАПРОСЫ (Адаптация для мобильных) */
+@media (max-width: 1024px) {
+    .campaign-container {
+        grid-template-columns: repeat(2, 1fr); /* 2 колонки */
+    }
+}
+
+@media (max-width: 768px) {
+    .campaign-container {
+        grid-template-columns: repeat(1, 1fr); /* 1 колонка */
+    }
+
+    .profile-container,
+    .container {
+        width: 90%;
+        padding: 20px;
+    }
+
+    .header-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .nav {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 10px;
+    }
+}

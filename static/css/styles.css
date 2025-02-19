@@ -812,3 +812,111 @@ form button:hover {
 }
 
 
+/* 🔹 Блок всех волонтёрских акций */
+.volunteering-block {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    background: #f7f7f7;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+/* 🔹 Карточка волонтёрской акции */
+.volunteer-card {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.volunteer-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* 🔹 Заголовок и дата */
+.volunteer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.volunteer-header h3 {
+    font-size: 18px;
+    color: #2C3691;
+    margin: 0;
+}
+
+.volunteer-date {
+    font-size: 14px;
+    color: #888;
+}
+
+/* 🔹 Описание */
+.volunteer-card p {
+    font-size: 14px;
+    color: #333;
+    margin: 0;
+}
+
+/* 🔹 Если нет акций */
+.no-opportunities {
+    background: #ffe6e6;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    color: #d9534f;
+    font-weight: bold;
+}
+/* 🔹 СТИЛИ ДЛЯ МОДАЛЬНОГО ОКНА */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    width: 50%;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h2 {
+    margin-bottom: 15px;
+}
+
+.modal-content ul {
+    list-style: none;
+    padding: 0;
+}
+
+.modal-content li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.close {
+    float: right;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: red;
+}

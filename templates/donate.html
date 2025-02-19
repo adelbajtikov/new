@@ -8,31 +8,34 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
-        <!-- Header -->
         <header class="header">
             <div class="header-container">
-                <!-- Логотип -->
                 <div class="logo">
                     <img src="/static/images/logo.png" alt="Alterra" class="logo-img">
                     <span class="logo-text">Alterra</span>
                 </div>
-    
-                <!-- Навигация -->
+
                 <nav class="nav">
                     <a href="{{url_for('home')}}">Пожертвования</a>
                     <a href="{{ url_for('volunteering') }}">Волонтёрства</a>
                     <a href="{{url_for('organizations')}}">Организации</a>
                 </nav>
-    
-                <!-- Аватар пользователя -->
+
                 <div class="user-profile">
-                    <img src="/static/images/profile.jpg" alt="Профиль" class="user-avatar">
+                    {% if user %}
+                        <a href="{{ url_for('profile') }}">
+                            <img src="{{ user['avatar'] if user['avatar'] else '/static/images/default_avatar.png' }}" class="user-avatar">
+                        </a>
+                        <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}">
+                            <img src="/static/images/user.png" alt="Гость" class="user-avatar">
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         </header>
 
-        <!-- Main Content -->
         <main class="donate-page">
             <div class="donate-container">
                 <h1>Пожертвовать на кампанию: {{ campaign['title'] }}</h1>
@@ -42,7 +45,15 @@
                 </div>
                 <p>Собрано: ${{ campaign['collected'] }} из ${{ campaign['goal'] }}</p>
 
-                <form action="" method="POST" class="donate-form">
+                <div class="payment-details">
+                    <h2>Реквизиты для оплаты</h2>
+                    <p>{{ campaign['payment_details'] }}</p>
+                </div>
+
+                <!-- 🔹 Форма пожертвования -->
+                <form id="donation-form" class="donate-form" enctype="multipart/form-data">
+                    <input type="hidden" id="campaign_id" name="campaign_id" value="{{ campaign['id'] }}">
+
                     <label for="name">Ваше имя:</label>
                     <input type="text" id="name" name="name" placeholder="Введите ваше имя" required>
 
@@ -52,22 +63,93 @@
                     <label for="message">Сообщение (необязательно):</label>
                     <textarea id="message" name="message" placeholder="Ваше сообщение"></textarea>
 
+                    <label for="receipt">Прикрепить чек (JPG, PNG, PDF):</label>
+                    <input type="file" id="receipt" name="receipt" accept=".jpg, .jpeg, .png, .pdf" required>
+
                     <button type="submit" class="btn">Пожертвовать</button>
                 </form>
             </div>
         </main>
 
-        <!-- Footer -->
+        <!-- 🔹 Модальное окно "Спасибо за пожертвование" -->
+        <div id="thankYouModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeThankYouModal()">&times;</span>
+                <h2>Спасибо за ваш вклад!</h2>
+                <p>Ваше пожертвование было успешно отправлено.</p>
+            </div>
+        </div>
+
         <footer class="footer">
             <div class="footer-container">
                 <div class="footer-logo">
-                    <span>Alterra</span>
+                    <img src="/static/images/logo.png" alt="Alterra" class="footer-logo-img">
+                    <span class="footer-logo-text">Alterra</span>
                 </div>
                 <div class="footer-info">
-                    <p>Контакты: +773-34-64-64</p>
+                    <p><strong>Наш адрес:</strong><br>Медерова 123/4</p>
+                    <p><strong>Общие вопросы:</strong><br>+773-34-64-64</p>
+                    <p><strong>Отдел по сбору средств:</strong><br>+772-16-99-55<br>+509-66-97-90</p>
                 </div>
             </div>
         </footer>
+
     </div>
+
+    <script>
+        document.getElementById("donation-form").addEventListener("submit", function(event) {
+            event.preventDefault(); 
+
+            let formData = new FormData(this);
+
+            fetch("/donate/" + document.getElementById("campaign_id").value, {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById("thankYouModal").style.display = "block"; 
+                } else {
+                    alert("Ошибка: " + data.error);
+                }
+            })
+            .catch(error => console.error("Ошибка:", error));
+        });
+
+        function closeThankYouModal() {
+            document.getElementById("thankYouModal").style.display = "none";
+        }
+    </script>
+
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            margin: 15% auto;
+            width: 50%;
+            text-align: center;
+            border-radius: 8px;
+        }
+
+        .close {
+            color: red;
+            float: right;
+            font-size: 28px;
+            cursor: pointer;
+        }
+    </style>
+
 </body>
 </html>

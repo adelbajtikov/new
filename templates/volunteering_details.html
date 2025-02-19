@@ -3,20 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Создать кампанию</title>
+    <title>{{ opportunity.title }}</title>
+
     <style>
-        /* 🔹 Общие стили */
+        /* 🎨 Основные стили */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #2e004b; /* Тёмно-фиолетовый */
-            color: #fff;
-            text-align: center;
+            font-family: 'Arial', sans-serif;
+            background: #f4f4f4;
+            color: #4B0082; /* Фиолетовый */
             margin: 0;
             padding: 0;
         }
+
         .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 26px;
+            color: #4B0082;
+            margin-bottom: 15px;
+        }
+
+        .volunteer-image {
             width: 100%;
-            margin: 0 auto;
+            max-height: 350px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 20px;
+            background: #4B0082; /* Фиолетовый */
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            font-size: 16px;
+            margin-top: 20px;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: #6A0DAD; /* Светлее фиолетовый */
+            transform: scale(1.05);
+        }
+
+        /* 🎨 Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            width: 360px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            color: #4B0082;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 10px;
+            font-size: 22px;
+        }
+
+        .close {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+            color: #4B0082;
+        }
+
+        .close:hover {
+            color: #6A0DAD;
         }
         .profile-avatar {
             width: 120px;
@@ -145,69 +233,8 @@
             font-weight: bold;
             color: #6a1b9a;
         }
-
-        /* 🔹 Контейнер */
-        .form-container {
-            width: 50%;
-            margin: 50px auto;
-            padding: 20px;
-            background: #4a0072; /* Глубокий фиолетовый */
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(255, 221, 51, 0.8);
-        }
-
-        h1 {
-            color: #ffdd33; /* Жёлтый */
-        }
-
-        /* 🔹 Поля ввода */
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 2px solid #ffdd33;
-            border-radius: 5px;
-            background: #2e004b;
-            color: white;
-            font-size: 16px;
-        }
-
-        input::placeholder, textarea::placeholder {
-            color: #cccccc;
-        }
-
-        /* 🔹 Кнопка */
-        .btn {
-            background-color: #ffdd33;
-            color: #2e004b;
-            font-size: 18px;
-            font-weight: bold;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .btn:hover {
-            background-color: #ffcc00;
-        }
-
-        /* 🔹 Форма */
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        /* 🔹 Заголовки полей */
-        label {
-            font-size: 18px;
-            text-align: left;
-        }
     </style>
 </head>
-
 <body>
     <!-- 🔹 HEADER -->
     <header class="header">
@@ -240,39 +267,42 @@
             </div>
         </div>
     </header>
-    <!-- 🔹 Форма создания кампании -->
-    <div class="form-container">
-        <h1>Создать новую кампанию</h1>
-        <form action="{{ url_for('create_campaign') }}" method="POST" enctype="multipart/form-data">
-
-            <!-- ✅ Название -->
-            <label for="title">Название кампании:</label>
-            <input type="text" id="title" name="title" placeholder="Введите название" required>
-
-            <!-- ✅ Описание -->
-            <label for="description">Описание:</label>
-            <textarea id="description" name="description" placeholder="Расскажите о кампании" required></textarea>
-
-            <!-- ✅ Цель сбора -->
-            <label for="goal">Цель сбора (в $):</label>
-            <input type="number" id="goal" name="goal" placeholder="Введите сумму цели" min="1" required>
-
-            <!-- ✅ Количество дней -->
-            <label for="days_left">Количество дней:</label>
-            <input type="number" id="days_left" name="days_left" placeholder="Введите срок кампании" min="1" required>
-
-            <!-- ✅ Реквизиты -->
-            <label for="payment_details">Реквизиты для пожертвований:</label>
-            <textarea id="payment_details" name="payment_details" placeholder="Введите номер карты, PayPal или другие данные" required></textarea>
-
-            <!-- ✅ Изображение -->
-            <label for="image">Загрузить изображение:</label>
-            <input type="file" id="image" name="image" accept=".png, .jpg, .jpeg, .gif" required>
-
-            <!-- ✅ Кнопка -->
-            <button type="submit" class="btn">Создать кампанию</button>
-        </form>
+    <div class="container">
+        <h1>{{ opportunity.title }}</h1>
+        <img src="{{ opportunity.image_url }}" alt="{{ opportunity.title }}" class="volunteer-image">
+        <p><strong>Описание:</strong> {{ opportunity.description }}</p>
+        <p><strong>Дата:</strong> {{ opportunity.date }}</p>
+        <button class="btn" onclick="joinVolunteering({{ opportunity.id }})">Принять участие</button>
     </div>
+
+    <!-- 🎉 Модальное окно с подтверждением -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSuccessModal()">&times;</span>
+            <h2>Вы успешно зарегистрированы!</h2>
+            <p>Спасибо за участие в волонтёрской программе.</p>
+            <button class="btn" onclick="closeSuccessModal()">Закрыть</button>
+        </div>
+    </div>
+
+    <script>
+        function joinVolunteering(opportunityId) {
+            fetch(`/join_volunteering/${opportunityId}`, { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message.includes("успешно")) {
+                        document.getElementById("successModal").style.display = "flex";
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => console.error("Ошибка:", error));
+        }
+
+        function closeSuccessModal() {
+            document.getElementById("successModal").style.display = "none";
+        }
+    </script>
 
 </body>
 </html>

@@ -10,19 +10,15 @@
     <div class="container">
         <header class="header">
             <div class="header-container">
-                <!-- Логотип -->
                 <div class="logo">
                     <img src="/static/images/logo.png" alt="Alterra" class="logo-img">
                     <span class="logo-text">Alterra</span>
                 </div>
-    
-                <!-- Навигация -->
                 <nav class="nav">
                     <a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Пожертвования</a>
                     <a href="{{ url_for('volunteering') }}" class="{% if request.endpoint == 'volunteering' %}active{% endif %}">Волонтёрства</a>
                     <a href="{{ url_for('organizations') }}" class="{% if request.endpoint == 'organizations' %}active{% endif %}">Организации</a>
                 </nav>
-                <!-- Аватар пользователя -->
                 <div class="user-profile">
                     {% if session.get('user_id') %}
                         <a href="{{ url_for('profile') }}">
@@ -36,50 +32,78 @@
                         </a>
                     {% endif %}
                 </div>
-                
             </div>
         </header>
 
-        <!-- Main Content -->
         <main>
-            <!-- Carousel Section -->
-            <div class="carousel">
-                {% for campaign in campaigns[:3] %}
-                <div class="slide">
-                    <section class="campaign">
-                        <div class="cont">
-                            <h2>{{ campaign['title'] }}</h2>
-                            <p>{{ campaign['description'] }}</p>
-                            <p><strong>Осталось:</strong> {{ campaign['days_left'] }} дней</p>
-                            <div class="progress-bar">
-                                <div style="width: {{ (campaign['collected'] / campaign['goal']) * 100 }}%;"></div>
-                            </div>
-                            <p><strong>Собрано:</strong> ${{ campaign['collected'] }} из ${{ campaign['goal'] }}</p>
-                            <button class="btn">
+            <!-- 🔹 Карусель кампаний -->
+            {% if campaigns and campaigns|length > 0 %}
+                <div class="carousel">
+                    {% for campaign in campaigns[:3] %}
+                    <div class="slide">
+                        <section class="campaign">
+                            <div class="cont">
+                                <h2>{{ campaign['title'] }}</h2>
+                                <p>{{ campaign['description'] }}</p>
+                                <p><strong>Осталось:</strong> {{ campaign['days_left'] }} дней</p>
+                                <div class="progress-bar">
+                                    <div style="width: {{ (campaign['collected'] / campaign['goal']) * 100 }}%;"></div>
+                                </div>
+                                <p><strong>Собрано:</strong> ${{ campaign['collected'] }} из ${{ campaign['goal'] }}</p>
                                 <a href="{{ url_for('donate', campaign_id=campaign['id']) }}" style="color: #fff; text-decoration: none;">
-                                    Пожертвовать
+                                <button class="btn">
+                                        Пожертвовать
+                                </button>
                                 </a>
-                            </button>
+                            </div>
+                        </section>
+
+                        <!-- 🔹 Галерея изображений внутри кампании -->
+                        <div class="image-slider">
+                            <button class="prev-image" onclick="prevImage({{ loop.index0 }})">&#10094;</button>
+                            <div class="image-container">
+                                <img class="campaign-image" src="{{ campaign['image_url'] }}" alt="{{ campaign['title'] }}">
+                                {% if campaign['additional_images'] %}
+                                    {% for img in campaign['additional_images'] %}
+                                        <img class="campaign-image hidden" src="{{ img }}" alt="{{ campaign['title'] }}">
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <button class="prev" onclick="prevSlide()">&#10094;</button>
+                            <button class="next" onclick="nextSlide()">&#10095;</button>
+
                         </div>
-                    </section>
-                    <img src="{{ campaign['image_url'] }}" alt="{{ campaign['title'] }}">
-                </div>
-                {% endfor %}
-                
-                <!-- Navigation Dots -->
-                <div class="dots">
-                    {% for _ in campaigns [:3]%}
-                    <span class="dot" onclick="goToSlide({{ loop.index0 }})"></span>
+
+                    </div>
                     {% endfor %}
                 </div>
-        
-                <!-- Controls -->
-                <button class="prev" onclick="prevSlide()">&#10094;</button>
-                <button class="next" onclick="nextSlide()">&#10095;</button>
-            </div>
+            {% endif %}
         </main>
-        
     </div>
+
+    <!-- 🔹 JavaScript (для перелистывания картинок) -->
+    <script>
+        function nextImage(slideIndex) {
+            const images = document.querySelectorAll(`.slide:nth-child(${slideIndex + 1}) .campaign-image`);
+            let currentIndex = Array.from(images).findIndex(img => !img.classList.contains('hidden'));
+
+            if (currentIndex < images.length - 1) {
+                images[currentIndex].classList.add('hidden');
+                images[currentIndex + 1].classList.remove('hidden');
+            }
+        }
+
+        function prevImage(slideIndex) {
+            const images = document.querySelectorAll(`.slide:nth-child(${slideIndex + 1}) .campaign-image`);
+            let currentIndex = Array.from(images).findIndex(img => !img.classList.contains('hidden'));
+
+            if (currentIndex > 0) {
+                images[currentIndex].classList.add('hidden');
+                images[currentIndex - 1].classList.remove('hidden');
+            }
+        }
+    </script>
+    <!-- Форма поиска -->
     <div class="search-container">
         <form action="/" method="POST" class="search-form">
             <div class="search-box">
@@ -90,11 +114,11 @@
             </div>
         </form>
     </div>
-    
+
     <div class="container_l">
         <h1>Люди нуждаются в помощи</h1>
         <div class="campaign-grid">
-            {% if campaigns %}
+            {% if campaigns and campaigns|length > 0 %}
                 {% for campaign in campaigns %}
                 <div class="campaign-card">
                     <img src="{{ campaign['image_url'] }}" alt="{{ campaign['title'] }}">
@@ -108,29 +132,30 @@
                             <span>${{ campaign['collected'] }}</span>
                             <span>${{ campaign['goal'] }}</span>
                         </div>
+                        <a href="{{ url_for('donate', campaign_id=campaign['id']) }}" style="color: #fff; text-decoration: none;">
                         <button class="btn">
-                            <a href="{{ url_for('donate', campaign_id=campaign['id']) }}" style="color: #fff; text-decoration: none;">
                                 Пожертвовать
-                            </a>
                         </button>
+                        </a>
                     </div>
                 </div>
                 {% endfor %}
             {% else %}
-                <p>Ничего не найдено по запросу "{{ query }}".</p>
+                <div class="no-campaigns">
+                    <h2>Пока что нет публикаций</h2>
+                    <p>Создайте первую кампанию, чтобы помочь нуждающимся!</p>
+                    <a href="{{ url_for('create_campaign') }}" class="btn">Создать кампанию</a>
+                </div>
             {% endif %}
         </div>
     </div>
-    
+
     <footer class="footer">
         <div class="footer-container">
-            <!-- Логотип -->
             <div class="footer-logo">
                 <img src="/static/images/logo.png" alt="Alterra" class="footer-logo-img">
                 <span class="footer-logo-text">Alterra</span>
             </div>
-    
-            <!-- Контактная информация -->
             <div class="footer-info">
                 <p><strong>Наш адрес:</strong><br>Медерова 123/4</p>
                 <p><strong>Общие вопросы:</strong><br>+773-34-64-64</p>
@@ -138,42 +163,21 @@
             </div>
         </div>
     </footer>
-    
-    <!-- JavaScript -->
+
     <script>
         let currentSlide = 0;
         const slides = document.querySelectorAll('.slide');
-        const dots = document.querySelectorAll('.dot');
-
         function showSlide(index) {
             if (index >= slides.length) index = 0;
             if (index < 0) index = slides.length - 1;
-
             slides.forEach((slide, i) => {
                 slide.style.display = i === index ? 'block' : 'none';
             });
-
-            dots.forEach(dot => dot.classList.remove('active'));
-            dots[index].classList.add('active');
-
             currentSlide = index;
         }
-
-        function nextSlide() {
-            showSlide(currentSlide + 1);
-        }
-
-        function prevSlide() {
-            showSlide(currentSlide - 1);
-        }
-
-        function goToSlide(index) {
-            showSlide(index);
-        }
-
-        // Initialize the carousel
+        function nextSlide() { showSlide(currentSlide + 1); }
+        function prevSlide() { showSlide(currentSlide - 1); }
         showSlide(currentSlide);
     </script>
 </body>
 </html>
-    
