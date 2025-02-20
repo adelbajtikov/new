@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ Панель</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .table th {
+            background-color: #007BFF;
+            color: white;
+        }
+        .btn {
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-primary {
+            background-color: #007BFF;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Админ Панель</h1>
+        
+        <h2>Пользователи</h2>
+        <table class="table">
+            <tr>
+                <th>ID</th>
+                <th>Имя</th>
+                <th>Статус</th>
+                <th>Действие</th>
+            </tr>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.username }}</td>
+                <td>{% if user.blocked %}Заблокирован{% else %}Активен{% endif %}</td>
+                <td>
+                    {% if user.blocked %}
+                        <button class="btn btn-success" onclick="unblockUser({{ user.id }})">Разблокировать</button>
+                    {% else %}
+                        <button class="btn btn-danger" onclick="blockUser({{ user.id }})">Заблокировать</button>
+                    {% endif %}
+                </td>
+                
+            </tr>
+            {% endfor %}
+        </table>
+        
+        <h2>Донаты</h2>
+        <table class="table">
+            <tr>
+                <th>ID</th>
+                <th>Кампания</th>
+                <th>Сумма</th>
+                <th>Дата</th>
+                <th>Чек</th>
+            </tr>
+            {% for donation in donations %}
+            <tr>
+                <td>{{ donation.id }}</td>
+                <td>{{ donation.campaign_title }}</td>
+                <td>{{ donation.amount }}</td>
+                <td>{{ donation.created_at }}</td>
+                <td>
+                    <a href="{{ url_for('view_receipt', donation_id=donation.id) }}" class="btn btn-primary">Посмотреть чек</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <a href="{{ url_for('admin_logout') }}" class="btn btn-danger" style="position: absolute; top: 20px; right: 20px;">
+            Выйти
+        </a>        
+    </div>
+    
+    <script>
+        function blockUser(userId) {
+            fetch(`/admin/block_user/${userId}`, {
+                method: 'POST'
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      alert(data.message);
+                      location.reload();
+                  }
+              });
+        }
+        function unblockUser(userId) {
+        fetch(`/admin/unblock_user/${userId}`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            });
+        }
+    </script>
+</body>
+</html>

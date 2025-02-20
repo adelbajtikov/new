@@ -1,18 +1,16 @@
 import sqlite3
+import os
 
-def confirm_all_volunteers():
-    conn = sqlite3.connect('database/donations.db')  # Подключение к БД
-    cursor = conn.cursor()
+DATABASE = os.path.abspath("database/donations.db")
 
-    # ✅ Обновляем статус всех участников на 'confirmed'
-    a = cursor.execute("SELECT * FROM volunteer_participants")
+conn = sqlite3.connect(DATABASE)
+cursor = conn.cursor()
 
-    # ✅ Сохраняем изменения и закрываем соединение
-    conn.commit()
-    conn.close()
+try:
+    cursor.execute("ALTER TABLE users ADD COLUMN blocked INTEGER DEFAULT 0;")
+    print("✅ Колонка 'blocked' успешно добавлена в таблицу users.")
+except sqlite3.OperationalError:
+    print("⚠️ Колонка 'blocked' уже существует.")
 
-    print(a)
-    return a
-
-# 🔥 Запускаем функцию
-confirm_all_volunteers()
+conn.commit()
+conn.close()

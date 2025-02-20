@@ -21,9 +21,70 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # Path to the SQLite database
 DATABASE = 'database/donations.db'
 app.secret_key = 'root_123'
+ADMIN_USERNAME = 'root_123'
+ADMIN_PASSWORD = '4444'
+
+def get_db_connection():
+    conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+@app.route('/admin', methods=['GET'])
+def admin_dashboard():
+    if 'admin' not in session:
+        return redirect(url_for('login'))
+    
+    conn = get_db_connection()
+    users = conn.execute("SELECT id, username, blocked FROM users").fetchall()
+    donations = conn.execute("SELECT d.id, d.amount, d.created_at, d.message, c.title as campaign_title FROM donations d JOIN campaigns c ON d.campaign_id = c.id").fetchall()
+    conn.close()
+    
+    return render_template('admin.html', users=users, donations=donations)
+
+
+
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin', None)
+    flash('Вы вышли из админ-панели', 'info')
+    return redirect(url_for('login'))
+
+@app.route('/admin/block_user/<int:user_id>', methods=['POST'])
+def block_user(user_id):
+    if 'admin' not in session:
+        return jsonify({'error': 'Доступ запрещен'}), 403
+    
+    conn = get_db_connection()
+    conn.execute("UPDATE users SET blocked = 1 WHERE id = ?", (user_id,))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'success': True, 'message': 'Пользователь заблокирован'})
+
+@app.route('/admin/view_receipt/<int:donation_id>')
+def view_receipt(donation_id):
+    conn = get_db_connection()
+    donation = conn.execute("SELECT d.id, d.amount, d.created_at, d.message, c.title as campaign_title FROM donations d JOIN campaigns c ON d.campaign_id = c.id WHERE d.id = ?", (donation_id,)).fetchone()
+    conn.close()
+    
+    if not donation:
+        return "Чек не найден", 404
+    
+    return render_template('receipt.html', donation=donation)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
+@app.route('/admin/unblock_user/<int:user_id>', methods=['POST'])
+def unblock_user(user_id):
+    if 'admin' not in session:
+        return jsonify({'error': 'Доступ запрещен'}), 403
+    
+    conn = get_db_connection()
+    conn.execute("UPDATE users SET blocked = 0 WHERE id = ?", (user_id,))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'success': True, 'message': 'Пользователь разблокирован'})
+     
 
 # Функция поиска похожих кампаний
 def delete_old_entries():
@@ -474,6 +535,13 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
+        # Проверяем, если зашел админ
+        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+            session['admin'] = True
+            flash('Вы вошли как администратор!', 'success')
+            return redirect(url_for('admin_dashboard'))
+
+        # Если не админ, проверяем в БД
         conn = get_db_connection()
         user = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
         conn.close()
@@ -488,6 +556,7 @@ def login():
             return redirect(url_for('login'))
 
     return render_template('login.html')
+
 # Выход из аккаунта
 @app.route('/logout')
 def logout():
