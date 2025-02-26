@@ -89,7 +89,9 @@
                 <th>Кампания</th>
                 <th>Сумма</th>
                 <th>Дата</th>
+                <th>ID донора</th>
                 <th>Чек</th>
+                
             </tr>
             {% for donation in donations %}
             <tr>
@@ -97,12 +99,15 @@
                 <td>{{ donation.campaign_title }}</td>
                 <td>{{ donation.amount }}</td>
                 <td>{{ donation.created_at }}</td>
+                <td>{{ donation.user_id }}</td>
+
                 <td>
                     <a href="{{ url_for('view_receipt', donation_id=donation.id) }}" class="btn btn-primary">Посмотреть чек</a>
                 </td>
             </tr>
             {% endfor %}
         </table>
+        <a href="{{ url_for('manage_ads') }}" class="btn">Управление рекламой</a>
         <a href="{{ url_for('admin_logout') }}" class="btn btn-danger" style="position: absolute; top: 20px; right: 20px;">
             Выйти
         </a>        

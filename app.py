@@ -36,10 +36,12 @@ def admin_dashboard():
     
     conn = get_db_connection()
     users = conn.execute("SELECT id, username, blocked FROM users").fetchall()
-    donations = conn.execute("SELECT d.id, d.amount, d.created_at, d.message, c.title as campaign_title FROM donations d JOIN campaigns c ON d.campaign_id = c.id").fetchall()
+    ads = conn.execute("SELECT * FROM ads").fetchall()
+    donations = conn.execute("SELECT d.id, d.amount, d.created_at, d.message, d.user_id, c.title as campaign_title FROM donations d JOIN campaigns c ON d.campaign_id = c.id").fetchall()
     conn.close()
     
-    return render_template('admin.html', users=users, donations=donations)
+    
+    return render_template('admin.html', users=users, donations=donations, ads = ads)
 
 
 
@@ -281,6 +283,7 @@ def home():
     else:
         campaign = None  # Если нет кампаний, передаем None
         percentage_collected = 0
+    ads = conn.execute("SELECT * FROM ads").fetchall()
 
     conn.close()
 
@@ -291,6 +294,7 @@ def home():
         campaigns=campaigns,
         percentage_collected=percentage_collected,
         query=query,
+        ads = ads,
     )
 
 @app.route('/donate/<int:campaign_id>', methods=['GET', 'POST'])
@@ -546,14 +550,17 @@ def login():
         user = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
         conn.close()
 
-        if user and check_password_hash(user['password'], password):
-            session['user_id'] = user['id']
-            session['username'] = user['username']
-            flash('Вы успешно вошли!', 'success')
-            return redirect(url_for('home'))
-        else:
-            flash('Неправильное имя пользователя или пароль.', 'danger')
-            return redirect(url_for('login'))
+        if user:
+            if user['blocked']:  # Проверяем, если пользователь заблокирован
+                print("🔴 Пользователь заблокирован!")
+                flash('Ваш аккаунт заблокирован!', 'danger')
+                return redirect(url_for('login'))
+
+            if check_password_hash(user['password'], password):
+                session['user_id'] = user['id']
+                session['username'] = user['username']
+                flash('Вы успешно вошли!', 'success')
+                return redirect(url_for('home'))
 
     return render_template('login.html')
 
@@ -730,6 +737,40 @@ def get_participants(opportunity_id):
 
     return jsonify([dict(participant) for participant in participants])
 
+@app.route('/admin/ads', methods=['GET', 'POST'])
+def manage_ads():
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+
+    conn = get_db_connection()
+
+    if request.method == 'POST':
+        title = request.form['title']
+        image_url = request.form['image_url']
+        link = request.form['link']
+
+        conn.execute("INSERT INTO ads (title, image_url, link) VALUES (?, ?, ?)", 
+                     (title, image_url, link))
+        conn.commit()
+        flash('Реклама добавлена!', 'success')
+
+    ads = conn.execute("SELECT * FROM ads").fetchall()
+    conn.close()
+
+    return render_template('admin_ads.html', ads=ads)
+
+@app.route('/admin/delete_ad/<int:ad_id>', methods=['POST'])
+def delete_ad(ad_id):
+    if 'admin' not in session:
+        return jsonify({'error': 'Доступ запрещен'}), 403
+
+    conn = get_db_connection()
+    conn.execute("DELETE FROM ads WHERE id = ?", (ad_id,))
+    conn.commit()
+    conn.close()
+
+    flash('Реклама удалена!', 'success')
+    return redirect(url_for('manage_ads'))
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Управление рекламой</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .form-group {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .btn-primary {
+            display: inline-block;
+            padding: 10px 20px;
+            color: white;
+            background: #007BFF;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        .ads-container {
+            margin-top: 20px;
+        }
+        .ad-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .ad-item img {
+            width: 100px;
+            border-radius: 5px;
+        }
+        .btn-danger {
+            padding: 5px 10px;
+            background: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .btn-danger:hover {
+            background: darkred;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Управление рекламой</h1>
+
+        <form method="POST">
+            <div class="form-group">
+                <label>Заголовок:</label>
+                <input type="text" name="title" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Ссылка на изображение:</label>
+                <input type="text" name="image_url" required>
+            </div>
+
+            <div class="form-group">
+                <label>Ссылка:</label>
+                <input type="text" name="link" required>
+            </div>
+
+            <button type="submit" class="btn-primary">Добавить рекламу</button>
+        </form>
+
+        <h2>Список рекламы</h2>
+        <div class="ads-container">
+            {% for ad in ads %}
+                <div class="ad-item">
+                    <p><strong>{{ ad.title }}</strong></p>
+                    <img src="{{ ad.image_url }}" alt="{{ ad.title }}">
+                    <p><a href="{{ ad.link }}" target="_blank">Перейти</a></p>
+                    <form method="POST" action="{{ url_for('delete_ad', ad_id=ad.id) }}">
+                        <button type="submit" class="btn-danger">Удалить</button>
+                    </form>
+                </div>
+            {% endfor %}
+        </div>
+
+        <a href="{{ url_for('admin_dashboard') }}" class="btn-primary">Назад в админ-панель</a>
+    </div>
+</body>
+</html>

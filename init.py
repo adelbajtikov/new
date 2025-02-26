@@ -1,16 +1,21 @@
 import sqlite3
-import os
 
-DATABASE = os.path.abspath("database/donations.db")
+DATABASE = 'database/donations.db'
 
 conn = sqlite3.connect(DATABASE)
 cursor = conn.cursor()
 
-try:
-    cursor.execute("ALTER TABLE users ADD COLUMN blocked INTEGER DEFAULT 0;")
-    print("✅ Колонка 'blocked' успешно добавлена в таблицу users.")
-except sqlite3.OperationalError:
-    print("⚠️ Колонка 'blocked' уже существует.")
+# Создаем таблицу рекламы, если её нет
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS ads (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        image_url TEXT NOT NULL,
+        link TEXT NOT NULL
+    )
+''')
 
 conn.commit()
 conn.close()
+
+print("✅ Таблица рекламы создана!")
