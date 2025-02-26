@@ -19,6 +19,7 @@
             padding: 20px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
+            text-align: center;
         }
         h1 {
             text-align: center;
@@ -47,6 +48,10 @@
             background-color: #dc3545;
             color: white;
         }
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
         .btn-primary {
             background-color: #007BFF;
             color: white;
@@ -57,11 +62,12 @@
     <div class="container">
         <h1>Админ Панель</h1>
         
-        <h2>Пользователи</h2>
+        <h2>Пользователи и Организации</h2>
         <table class="table">
             <tr>
                 <th>ID</th>
                 <th>Имя</th>
+                <th>Тип</th>
                 <th>Статус</th>
                 <th>Действие</th>
             </tr>
@@ -69,7 +75,8 @@
             <tr>
                 <td>{{ user.id }}</td>
                 <td>{{ user.username }}</td>
-                <td>{% if user.blocked %}Заблокирован{% else %}Активен{% endif %}</td>
+                <td>Пользователь</td>
+                <td>{% if user.blocked %}🔴 Заблокирован{% else %}🟢 Активен{% endif %}</td>
                 <td>
                     {% if user.blocked %}
                         <button class="btn btn-success" onclick="unblockUser({{ user.id }})">Разблокировать</button>
@@ -77,7 +84,21 @@
                         <button class="btn btn-danger" onclick="blockUser({{ user.id }})">Заблокировать</button>
                     {% endif %}
                 </td>
-                
+            </tr>
+            {% endfor %}
+            {% for org in organizations %}
+            <tr>
+                <td>{{ org.id }}</td>
+                <td>{{ org.name }}</td>
+                <td>Организация</td>
+                <td>{% if org.blocked %}🔴 Заблокирована{% else %}🟢 Активна{% endif %}</td>
+                <td>
+                    {% if org.blocked %}
+                        <button class="btn btn-success" onclick="unblockOrganization({{ org.id }})">Разблокировать</button>
+                    {% else %}
+                        <button class="btn btn-danger" onclick="blockOrganization({{ org.id }})">Заблокировать</button>
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
         </table>
@@ -91,7 +112,6 @@
                 <th>Дата</th>
                 <th>ID донора</th>
                 <th>Чек</th>
-                
             </tr>
             {% for donation in donations %}
             <tr>
@@ -100,14 +120,13 @@
                 <td>{{ donation.amount }}</td>
                 <td>{{ donation.created_at }}</td>
                 <td>{{ donation.user_id }}</td>
-
                 <td>
                     <a href="{{ url_for('view_receipt', donation_id=donation.id) }}" class="btn btn-primary">Посмотреть чек</a>
                 </td>
             </tr>
             {% endfor %}
         </table>
-        <a href="{{ url_for('manage_ads') }}" class="btn">Управление рекламой</a>
+        <a href="{{ url_for('manage_ads') }}" class="btn btn-primary">Управление рекламой</a>
         <a href="{{ url_for('admin_logout') }}" class="btn btn-danger" style="position: absolute; top: 20px; right: 20px;">
             Выйти
         </a>        
@@ -115,23 +134,36 @@
     
     <script>
         function blockUser(userId) {
-            fetch(`/admin/block_user/${userId}`, {
-                method: 'POST'
-            }).then(response => response.json())
+            fetch(`/admin/block_user/${userId}`, { method: 'POST' })
+              .then(response => response.json())
               .then(data => {
-                  if (data.success) {
-                      alert(data.message);
-                      location.reload();
-                  }
+                  alert(data.message);
+                  location.reload();
               });
         }
         function unblockUser(userId) {
-        fetch(`/admin/unblock_user/${userId}`, { method: 'POST' })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                location.reload();
-            });
+            fetch(`/admin/unblock_user/${userId}`, { method: 'POST' })
+              .then(response => response.json())
+              .then(data => {
+                  alert(data.message);
+                  location.reload();
+              });
+        }
+        function blockOrganization(orgId) {
+            fetch(`/admin/block_organization/${orgId}`, { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    location.reload();
+                });
+        }
+        function unblockOrganization(orgId) {
+            fetch(`/admin/unblock_organization/${orgId}`, { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    location.reload();
+                });
         }
     </script>
 </body>

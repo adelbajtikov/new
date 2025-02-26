@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Профиль организации</h1>
+    <img src="{{ org['avatar'] if org['avatar'] else '/static/images/default_org.png' }}" alt="Аватар">
+    <p>Название: {{ org['name'] }}</p>
+
+    <h2>Подписчики: {{ followers_count }}</h2>
+    <ul>
+        {% for follower in followers %}
+            <li>{{ follower['username'] }}</li>
+        {% endfor %}
+    </ul>
+    
+    <a href="{{ url_for('edit_organization_profile') }}">Редактировать профиль</a>
+    <a href="{{ url_for('create_volunteering') }}">Создать волонтерскую акцию</a>
+</body>
+</html>

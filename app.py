@@ -37,11 +37,12 @@ def admin_dashboard():
     conn = get_db_connection()
     users = conn.execute("SELECT id, username, blocked FROM users").fetchall()
     ads = conn.execute("SELECT * FROM ads").fetchall()
+    organizations = conn.execute("SELECT id, name, blocked FROM organizations").fetchall()
     donations = conn.execute("SELECT d.id, d.amount, d.created_at, d.message, d.user_id, c.title as campaign_title FROM donations d JOIN campaigns c ON d.campaign_id = c.id").fetchall()
     conn.close()
     
     
-    return render_template('admin.html', users=users, donations=donations, ads = ads)
+    return render_template('admin.html', users=users, organizations=organizations, donations=donations, ads = ads)
 
 
 
@@ -400,26 +401,51 @@ def thank_you():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+        account_type = request.form['account_type']
         username = request.form['username']
         password = request.form['password']
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+
         conn = get_db_connection()
         cursor = conn.cursor()
-        # Проверка на существование пользователя
-        cursor.execute('SELECT * FROM users WHERE username = ?', (username,))
-        if cursor.fetchone():
-            flash('Пользователь с таким именем уже существует!', 'danger')
-            return redirect(url_for('register'))
-        
-        # Сохранение нового пользователя
-        cursor.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, hashed_password))
+
+        if account_type == 'user':
+            cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hashed_password))
+        elif account_type == 'organization':
+            cursor.execute("INSERT INTO organizations (name, password) VALUES (?, ?)", (username, hashed_password))
+
         conn.commit()
         conn.close()
 
-        flash('Регистрация прошла успешно! Теперь вы можете войти.', 'success')
+        flash('Регистрация успешна!', 'success')
         return redirect(url_for('login'))
 
     return render_template('register.html')
+
+
+@app.route('/organization/<int:org_id>')
+def organization_dashboard(org_id):
+    conn = get_db_connection()
+
+    # Получаем данные организации
+    organization = conn.execute("SELECT * FROM organizations WHERE id = ?", (org_id,)).fetchone()
+
+    if not organization:
+        flash('Организация не найдена', 'danger')
+        return redirect(url_for('organizations'))
+
+    # Получаем список подписчиков этой организации
+    followers = conn.execute("""
+        SELECT users.username FROM followers 
+        JOIN users ON followers.user_id = users.id 
+        WHERE followers.organization_id = ?
+    """, (org_id,)).fetchall()
+
+    conn.close()
+
+    return render_template('organization_dashboard.html', organization=organization, followers=followers)
+
+
 @app.route('/profile')
 def profile():
     if not session.get('user_id'):
@@ -539,30 +565,85 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        # Проверяем, если зашел админ
+        # 1️⃣ Проверяем, если зашел админ
         if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
             session['admin'] = True
+            session['role'] = "admin"
             flash('Вы вошли как администратор!', 'success')
             return redirect(url_for('admin_dashboard'))
 
-        # Если не админ, проверяем в БД
+        # 2️⃣ Подключаемся к БД
         conn = get_db_connection()
-        user = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
-        conn.close()
+        cursor = conn.cursor()
 
+        # 3️⃣ Проверяем в таблице пользователей
+        user = cursor.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
         if user:
             if user['blocked']:  # Проверяем, если пользователь заблокирован
-                print("🔴 Пользователь заблокирован!")
                 flash('Ваш аккаунт заблокирован!', 'danger')
+                conn.close()
                 return redirect(url_for('login'))
 
             if check_password_hash(user['password'], password):
                 session['user_id'] = user['id']
                 session['username'] = user['username']
+                session['role'] = "user"  # ✅ Указываем роль
                 flash('Вы успешно вошли!', 'success')
+                conn.close()
                 return redirect(url_for('home'))
 
+        # 4️⃣ Проверяем в таблице организаций
+        organization = cursor.execute('SELECT * FROM organizations WHERE name = ?', (username,)).fetchone()
+        if organization:
+            if organization['blocked']:
+                flash('Ваша организация заблокирована!', 'danger')
+                conn.close()
+                return redirect(url_for('login'))
+
+            if check_password_hash(organization['password'], password):
+                session['org_id'] = organization['id']
+                session['username'] = organization['name']
+                session['role'] = "organization"
+                flash('Вы вошли как организация!', 'success')
+                conn.close()
+                return redirect(url_for('organization_dashboard', org_id=organization['id']))
+
+
+        conn.close()
+        flash('Неверное имя пользователя или пароль.', 'danger')
+
     return render_template('login.html')
+@app.route('/organization/edit', methods=['GET', 'POST'])
+def edit_organization_profile():
+    if 'org_id' not in session:
+        flash('Вы должны войти как организация!', 'danger')
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    organization = conn.execute("SELECT * FROM organizations WHERE id = ?", (session['org_id'],)).fetchone()
+
+    if not organization:
+        flash("Организация не найдена!", "danger")
+        conn.close()
+        return redirect(url_for("organizations"))
+
+    if request.method == 'POST':
+        new_name = request.form['name']
+        new_description = request.form['description']
+        new_image_url = request.form['image_url']
+
+        conn.execute("UPDATE organizations SET name = ?, description = ?, image_url = ? WHERE id = ?", 
+                     (new_name, new_description, new_image_url, session['org_id']))
+        conn.commit()
+        conn.close()
+
+        flash('Профиль обновлён!', 'success')
+        return redirect(url_for('organization_dashboard', org_id=session['org_id']))
+
+    conn.close()
+    return render_template('edit_organization_profile.html', organization=organization)
+
+
 
 # Выход из аккаунта
 @app.route('/logout')
@@ -771,6 +852,70 @@ def delete_ad(ad_id):
 
     flash('Реклама удалена!', 'success')
     return redirect(url_for('manage_ads'))
+
+@app.route('/organization/profile')
+def organization_profile():
+    if 'org_id' not in session:
+        flash('Вы должны войти как организация!', 'danger')
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    organization = conn.execute("SELECT * FROM organizations WHERE id = ?", (session['org_id'],)).fetchone()
+    followers = conn.execute("SELECT users.username FROM followers JOIN users ON followers.user_id = users.id WHERE followers.organization_id = ?", (session['org_id'],)).fetchall()
+    conn.close()
+
+    return render_template('organization_profile.html', organization=organization, followers=followers)
+@app.route('/follow_organization/<int:organization_id>', methods=['POST'])
+def follow_organization(organization_id):
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Вы должны быть авторизованы!'}), 403
+
+    user_id = session['user_id']
+    conn = get_db_connection()
+
+    # Проверяем, подписан ли уже пользователь
+    existing_follow = conn.execute(
+        "SELECT * FROM followers WHERE user_id = ? AND organization_id = ?",
+        (user_id, organization_id)
+    ).fetchone()
+
+    if existing_follow:
+        conn.close()
+        return jsonify({'success': False, 'error': 'Вы уже подписаны на эту организацию!'}), 400
+
+    # ✅ Добавляем пользователя в таблицу followers
+    conn.execute(
+        "INSERT INTO followers (user_id, organization_id) VALUES (?, ?)",
+        (user_id, organization_id)
+    )
+    conn.commit()
+    conn.close()
+
+    return jsonify({'success': True, 'message': 'Вы успешно подписались на организацию!'})
+@app.route('/admin/block_organization/<int:org_id>', methods=['POST'])
+def block_organization(org_id):
+    if 'admin' not in session:
+        return jsonify({'error': 'Доступ запрещен'}), 403
+    
+    conn = get_db_connection()
+    conn.execute("UPDATE organizations SET blocked = 1 WHERE id = ?", (org_id,))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'success': True, 'message': 'Организация заблокирована'})
+
+
+@app.route('/admin/unblock_organization/<int:org_id>', methods=['POST'])
+def unblock_organization(org_id):
+    if 'admin' not in session:
+        return jsonify({'error': 'Доступ запрещен'}), 403
+    
+    conn = get_db_connection()
+    conn.execute("UPDATE organizations SET blocked = 0 WHERE id = ?", (org_id,))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'success': True, 'message': 'Организация разблокирована'})
 
 if __name__ == '__main__':
     app.run(debug=True)

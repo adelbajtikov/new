@@ -24,6 +24,31 @@
             background-color: #f8d7da;
             color: #721c24;
         }
+        .account-type-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        .account-type {
+            padding: 10px 20px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        .account-type:hover {
+            background: #f0f0f0;
+        }
+        input[type="radio"] {
+            display: none;
+        }
+        input[type="radio"]:checked + label {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
     </style>
 </head>
 <body>
@@ -76,6 +101,17 @@
         {% endwith %}
 
         <form method="POST">
+            <label>Выберите тип аккаунта:</label>
+            <div class="account-type-container">
+                <input type="radio" id="user" name="account_type" value="user" checked>
+                <label class="account-type" for="user">👤 Пользователь</label>
+
+                <input type="radio" id="organization" name="account_type" value="organization">
+                <label class="account-type" for="organization">🏢 Организация</label>
+
+
+            </div>
+
             <label for="username">Имя пользователя</label>
             <input type="text" id="username" name="username" required>
             
@@ -86,5 +122,6 @@
         </form>
         <p>Нет аккаунта? <a href="{{ url_for('register') }}">Зарегистрируйтесь</a></p>
     </div>
+
 </body>
 </html>
