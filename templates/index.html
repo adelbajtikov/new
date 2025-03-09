@@ -20,9 +20,11 @@
     }
 
     .ad-card {
-        width: 320px;
-        height: 400px;
-        background: linear-gradient(135deg, #ff9800, #ff5722);
+        display: flex;
+        align-items: stretch;
+        width: 800px; 
+        height: 150px; 
+        background: white;
         border-radius: 15px;
         overflow: hidden;
         position: relative;
@@ -33,42 +35,48 @@
     }
 
     .ad-card:hover {
-        transform: translateY(-10px);
+        transform: translateY(-5px);
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
     }
 
     .ad-card img {
-        width: 100%;
-        height: 200px;
+        width: 250px;
+        height: 100%;
         object-fit: cover;
-        border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 15px 0 0 15px;
     }
 
     .ad-content {
-        padding: 20px;
-        text-align: center;
-        color: white;
+        flex: 1;
+        padding: 15px;
+        color: black;
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 
     .ad-title {
-        font-size: 20px;
+        font-size: 18px;
         font-weight: bold;
-        margin-bottom: 10px;
+        margin-bottom: 5px;
     }
 
     .ad-btn {
         display: inline-block;
-        padding: 10px 20px;
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        border-radius: 8px;
+        padding: 8px 15px;
+        background: rgba(0, 0, 0, 0.1);
+        color: black;
+        border-radius: 5px;
         font-weight: bold;
         text-decoration: none;
         transition: background 0.3s;
+        text-align: center;
+        width: fit-content;
     }
 
     .ad-btn:hover {
-        background: rgba(255, 255, 255, 0.4);
+        background: rgba(0, 0, 0, 0.2);
     }
 
     @keyframes fadeIn {
@@ -223,19 +231,22 @@
                     <a href="{{ url_for('create_campaign') }}" class="btn">Создать кампанию</a>
                 </div>
             {% endif %}
-        </div>
+        </div>   
+        <hr style="border: 1px solid rgba(255, 255, 255, 0.3); margin: 40px 0;">
+
         <div class="ads-container">
             {% for ad in ads %}
                 <div class="ad-card">
                     <img src="{{ ad.image_url }}" alt="{{ ad.title }}">
                     <div class="ad-content">
                         <h3 class="ad-title">{{ ad.title }}</h3>
+                        <p>{{ ad.description }}</p>
                         <a href="{{ ad.link }}" target="_blank" class="ad-btn">Подробнее</a>
                     </div>
                 </div>
             {% endfor %}
         </div>
-        
+
 
     </div>
 
