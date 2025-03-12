@@ -1,0 +1,404 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Iowan+Old+Style:wght@400;600;700&display=swap');
+
+/* Общие стили */
+body {
+    margin: 0;
+    font-family: "Inter", sans-serif;
+    background-color: #f2f2f2;
+}
+.btn {
+    cursor: pointer;
+    background-color: #5f2fb0;
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+.btn:hover {
+    background-color: #4b2392;
+}
+/* Делает фиолетовый фон на всю ширину */
+.profile-container {
+    background-color: #9E58F1; /* Фон как в первом скриншоте */
+    padding: 100px 0;          /* Отступы сверху/снизу */
+    color: #fff;              /* Белый текст */
+    text-align: center;       /* Текст по центру */
+}
+
+/* Если h1 всё ещё есть, можно скрыть или изменить стили */
+.profile-container h1 {
+    display: none; /* или margin-bottom: 30px; если хотите оставить */
+}
+
+/* Вспомогательный контейнер, чтобы выстроить аватар, описание и подписки в ряд */
+.profile-header-row {
+    max-width: 900px;
+    margin: 0 auto;           /* Центрируем по горизонтали */
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 20px;
+    background: #7F3FCF;      /* Чуть темнее фиолетовый "карточки" */
+    border-radius: 12px;
+    padding: 30px;
+}
+
+/* Аватар и форма смены фото */
+.profile-avatar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 20px; /* Можно убрать, если используете gap в flex */
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    margin-bottom: 10px;
+}
+
+/* Информация о пользователе */
+.profile-info {
+    flex: 1;           /* Занимает всё свободное место */
+    text-align: left;  /* Текст влево */
+}
+
+.username {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.user-description {
+    font-size: 14px;
+    line-height: 1.4em;
+    margin-bottom: 20px;
+}
+
+/* Блоки статистики (19, 2021$, 37❤️) */
+.stats-row {
+    display: flex;
+    gap: 30px;
+}
+
+.stat-box {
+    text-align: center;
+}
+
+.stat-value {
+    display: block;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.stat-label {
+    font-size: 12px;
+}
+
+/* Блок Подписчики / Подписки */
+.follow-info {
+    text-align: right;
+}
+
+.follow-info p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+
+/* Блок кнопок под шапкой (Создать кампанию, История платежей, и т.д.) */
+.profile-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    background-color: #fff;
+    padding: 15px 10px;
+    margin-top: -20px; /* Подтягиваем вверх, чтобы перекрыть часть фиолетового фона */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.profile-actions p {
+    margin: 0;
+    font-size: 14px;
+    align-self: center;
+}
+
+/* Заголовки секций */
+h2 {
+    margin: 30px 0 15px;
+    font-size: 20px;
+    text-align: center;
+}
+
+/* Кампании (cards) */
+.campaign-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 0 15px;
+    margin-bottom: 30px;
+}
+.campaign-card {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.campaign-image {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+}
+.campaign-content {
+    padding: 15px;
+}
+.progress-bar {
+    background-color: #ddd;
+    height: 6px;
+    border-radius: 3px;
+    margin: 8px 0;
+    overflow: hidden;
+}
+.progress-bar div {
+    background-color: #5f2fb0;
+    height: 100%;
+}
+
+/* Блок "Вы ещё не создали ни одной кампании" */
+.no-campaigns, .no-volunteer-projects, .no-opportunities {
+    background-color: #fff;
+    margin: 0 15px 30px;
+    padding: 20px;
+    text-align: center;
+    border-radius: 8px;
+}
+
+/* Волонтёрские инициативы */
+.volunteer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 0 15px;
+    margin-bottom: 30px;
+}
+.volunteer-card {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.volunteer-content {
+    padding: 15px;
+}
+
+/* Модалки */
+.modal {
+    display: none; /* Скрыты по умолчанию */
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+.modal-content {
+    background-color: #fff;
+    margin: 50px auto;
+    padding: 20px;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 8px;
+    position: relative;
+}
+.close {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    cursor: pointer;
+}
+.close:hover {
+    color: #000;
+}
+.payments-container {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 10px;
+}
+.payments-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.payments-table th,
+.payments-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    font-size: 14px;
+}
+
+/* Секция "Мои участия в волонтёрских акциях" */
+.volunteering-block {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 0 15px;
+    margin-bottom: 30px;
+}
+.volunteer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+.volunteer-date {
+    font-size: 14px;
+    color: #666;
+}
+
+/* Рекомендованные кампании/волонтёрства */
+#recommended-campaigns,
+#recommended-volunteering {
+    margin: 0 15px 30px;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    min-height: 80px; /* Просто, чтобы было видно блок */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+/* Доп. стили для заголовков внутри */
+#recommended-campaigns h3,
+#recommended-volunteering h3 {
+    margin-top: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.header {
+    background-color: #fff;
+    border-bottom: 2px solid #e0e0e0;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Контейнер для хедера */
+.header-container {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Логотип */
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo-img {
+    width: 45px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.logo-text {
+    font-size: 33px;
+    line-height: 45px;
+    font-weight: 700;
+    color: #714C8D;
+    font-family: 'Iowan Old Style', serif;
+}
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-profile img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.logout-link {
+    color: red;
+    text-decoration: none;
+    margin-left: 10px;
+}
+
+/* Навигация */
+.nav {
+    display: flex;
+    gap: 50px;
+    margin-left: 450px;
+}
+
+.nav a {
+    text-decoration: none;
+    color: #000; /* стандартный цвет ссылок */
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.nav a:hover {
+    background-color: #f0f0f0; /* цвет при наведении */
+}
+
+.nav a.active {
+    border: 1px solid purple;/* цвет фона для активного элемента */  
+    font-weight: bold;
+}
+/* Аватар пользователя */
+.user-profile {
+    display: flex;
+    align-items: center;
+}
+
+.user-avatar {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #6a1b9a;
+}
+
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #6a1b9a;
+}
