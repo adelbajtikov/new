@@ -16,8 +16,15 @@
             padding: 0;
         }
         .container {
-            width: 100%;
+            width: 70%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
             margin: 0 auto;
+            width: 1500px;
+            margin-top: 70px;
+
         }
         .profile-avatar {
             width: 120px;
@@ -146,19 +153,14 @@
             font-weight: bold;
             color: #6a1b9a;
         }
-        /* 🔹 Сетка для карточек (по три в ряд) */
-        .volunteering-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            justify-content: center;
-            margin-top: 20px;
-        }
 
         /* 🔹 Стиль карточек */
         .volunteering-card {
             background-color: #4a0072; /* Темный фиолетовый */
-            border-radius: 10px;
+            height: 500px;
+            width: 400px;
+            margin: 25px;
+            border-radius: 40px;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s, box-shadow 0.3s;
@@ -167,12 +169,12 @@
         /* 🔹 Подсветка карточек при наведении */
         .volunteering-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(255, 255, 0, 0.5); /* Жёлтая подсветка */
+            box-shadow: 0 8px 16px rgba(252, 250, 138, 0.6); /* Жёлтая подсветка */
         }
 
         .volunteering-card img {
             width: 100%;
-            height: 200px;
+            height: 60%;
             object-fit: cover;
         }
 
@@ -191,20 +193,26 @@
             color: #ddd;
             margin-bottom: 15px;
         }
-
         .btn {
             display: inline-block;
-            background-color: #ffeb3b; /* Жёлтая кнопка */
-            color: #2e004b; /* Фиолетовый текст */
-            padding: 10px 20px;
+            height: 50px;
+            width: 160px;
+            padding: 12px 18px;
+            background: #ffeb3b;
+            color: #2e004b;
             text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: background-color 0.3s;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+            border: none;
+            outline: none;
         }
 
         .btn:hover {
-            background-color: #ffd600; /* Более яркий жёлтый */
+            background: #e7f188;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(252, 250, 138, 0.6);
         }
         /* Футер */
         .footer {
@@ -470,10 +478,8 @@
     </header>
     <!-- Контейнер -->
     <div class="container">
-        <h1>Волонтёрские Акции</h1>
 
         <!-- Сетка карточек -->
-        <div class="volunteering-grid">
             {% for opportunity in opportunities %}
             <div class="volunteering-card">
                 <img src="{{ opportunity['image_url'] }}" alt="{{ opportunity['title'] }}">
@@ -486,7 +492,6 @@
                 </div>
             </div>
             {% endfor %}
-        </div>
     </div>
     <footer class="footer">
         <div class="footer-container">

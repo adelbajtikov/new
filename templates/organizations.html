@@ -108,6 +108,60 @@
         .organization-card:hover::before {
             transform: translateX(-50%) scale(1.2);
         }
+
+        /* Футер */
+        .footer {
+            background-color: #ffffff; /* Белый фон */
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; /* Для адаптивности */
+            margin-top: 150px;
+            width: 100%;
+        }
+
+        .footer-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Логотип в футере */
+        .footer-logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .footer-logo-img {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .footer-logo-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #6a1b9a;
+        }
+
+        /* Контактная информация */
+        .footer-info {
+            text-align: right;
+            color: #6a1b9a; /* Фиолетовый цвет текста */
+        }
+
+        .footer-info p {
+            margin: 5px 0;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .footer-info strong {
+            font-size: 18px;
+        }
     </style>
 </head>
 <body>
@@ -156,6 +210,20 @@
         </div>
         {% endfor %}
     </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-logo">
+                <img src="/static/images/logo.png" alt="Alterra" class="footer-logo-img">
+                <span class="footer-logo-text">Alterra</span>
+            </div>
+            <div class="footer-info">
+                <p><strong>Наш адрес:</strong><br>Медерова 123/4</p>
+                <p><strong>Общие вопросы:</strong><br>+773-34-64-64</p>
+                <p><strong>Отдел по сбору средств:</strong><br>+772-16-99-55<br>+509-66-97-90</p>
+            </div>
+        </div>
+    </footer>
 
     <script>
         function followOrganization(organizationId) {
