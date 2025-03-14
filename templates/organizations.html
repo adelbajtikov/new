@@ -1,194 +1,178 @@
-    <!DOCTYPE html>
-    <html lang="ru">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="/static/css/organizations.css">
-        <title>Благотворительные организации</title>
-        <style>
-            body {
-                font-family: 'Arial', sans-serif;
-                background-color: #f5f7fa;
-                margin: 0;
-                padding: 0;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/organizations.css">
+    <title>Благотворительные организации</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to right, #e2ecf8, #ebf1f7, #f9f9fa);
+        }
 
-            /* 🔹 Контейнер страницы */
-            .container {
-                max-width: 1200px;
-                width: 100%;
-                margin: 40px auto;
-                padding: 20px;
-            }
+        .container {
+            max-width: 1500px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 70px;
+        }
 
-            /* 🔹 Сетка карточек */
-            .organizations-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-                gap: 20px;
-                justify-content: center;
-                max-width: 1000px; /* Ограничиваем ширину */
-            }
-
-            /* Если всего 1 карточка, центрируем */
-            .organizations-grid:has(.organization-card:only-child) {
-                display: flex;
-                justify-content: center;
-            }
-
-            /* 🔹 Карточка организации */
-            .organization-card {
-                background: white;
-                border-radius: 12px;
-                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-                overflow: hidden;
-                transition: transform 0.3s ease-in-out, box-shadow 0.3s;
-                position: relative;
-                width: 320px; /* Фиксированная ширина */
-                flex: 1 1 320px; /* Минимальная ширина */
-                max-width: 100%;
-            }
-
-            .organization-card:hover {
-                transform: translateY(-8px);
-                box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
-            }
-
-            /* 🔹 Картинка */
-            /* 🔹 Улучшение качества отображения изображений */
-            .organization-card img {
-                width: 100%; /* Растягиваем по ширине карточки */
-                height: 200px; /* Фиксированная высота */
-                object-fit: cover; /* Обрезка по контейнеру без искажения */
-                object-position: center; /* Центрирование изображения */
-                border-bottom: 4px solid #007bff;
-            }
-
-            /* 🔹 Контент карточки */
-            .card-content {
-                padding: 20px;
-                text-align: center;
-                position: relative;
-            }
-
-            .card-content h2 {
-                font-size: 22px;
-                color: #333;
-                margin-bottom: 10px;
-            }
-
-            .card-content p {
-                font-size: 14px;
-                color: #666;
-                margin-bottom: 15px;
-            }
-
-            /* 🔹 Кнопка */
-            .btn {
-                display: inline-block;
-                padding: 12px 18px;
-                background: linear-gradient(45deg, #007bff, #0056b3);
-                color: white;
-                text-decoration: none;
-                border-radius: 8px;
-                font-weight: bold;
-                transition: background 0.3s ease-in-out, transform 0.2s;
-            }
-
-            .btn:hover {
-                background: linear-gradient(45deg, #0056b3, #003b80);
-                transform: scale(1.05);
-                cursor: url("https://cur.cursors-4u.net/others/oth-1/oth20.cur"), pointer;
-            }
-
-            /* 🔹 Фоновые элементы */
-            .organization-card::before {
-                content: "";
-                position: absolute;
-                top: -50px;
-                right: -50px;
-                width: 100px;
-                height: 100px;
-                background: rgba(0, 123, 255, 0.1);
-                border-radius: 50%;
-                transition: transform 0.3s;
-            }
-
-            .organization-card:hover::before {
-                transform: scale(1.2);
-            }
-        </style>
-    </head>
-    <body>
-        <header class="header">
-            <div class="header-container">
-                <!-- Логотип -->
-                <div class="logo">
-                    <img src="/static/images/logo.png" alt="Alterra" class="logo-img">
-                    <span class="logo-text">Alterra</span>
-                </div>
-
-                <!-- Навигация -->
-                <nav class="nav">
-                    <a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Пожертвования</a>
-                    <a href="{{ url_for('volunteering') }}" class="{% if request.endpoint == 'volunteering' %}active{% endif %}">Волонтёрства</a>
-                    <a href="{{ url_for('organizations') }}" class="{% if request.endpoint == 'organizations' %}active{% endif %}">Организации</a>
-                </nav>
-
-                <!-- Аватар пользователя -->
-                <div class="user-profile">
-                    {% if session.get('user_id') %}
-                        <a href="{{ url_for('profile') }}">
-                            <img src="{{ user['avatar'] if user['avatar'] else '/static/images/default_avatar.png' }}" 
-                                alt="{{ session['username'] }}" class="user-avatar">
-                        </a>
-                        <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
-                    {% else %}
-                        <a href="{{ url_for('login') }}">
-                            <img src="/static/images/user.png" alt="Гость" class="user-avatar">
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
-        </header>
-
-        <main class="container">
-            <div class="organizations-grid">
-                {% for organization in organizations %}
-                <div class="organization-card">
-                    <img src="{{ organization['image_url'] }}" alt="{{ organization['name'] }}">
-                    <div class="card-content">
-                        <h2>{{ organization['name'] }}</h2>
-                        <p>{{ organization['description'] }}</p>
-                        
-                        <button class="btn" onclick="followOrganization({{ organization['id'] }})">
-                            Подписаться
-                        </button>                    
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </main>
-        <script>
-            function followOrganization(organizationId) {
-                fetch(`/follow_organization/${organizationId}`, { 
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert("Вы подписались на организацию!");
-                        location.reload();
-                    } else {
-                        alert("Ошибка: " + data.error);
-                    }
-                });
-            }
-        </script>
+        .organization-card {
+            background: white;
+            border-radius: 40px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s;
+            position: relative;
+            width: 400px;
+            height: 500px;
+            margin: 25px;
+        }
         
-    </body>
-    </html>
+        .organization-card img {
+            height: 60%;
+        }
+
+        .card-content {
+            height: 40%;
+        }
+
+        .card-content div {
+            height: 50%;
+        }
+
+        .organization-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-content h2 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .card-content p {
+            font-size: 15px;
+            color: #444;
+            line-height: 1.5;
+        }
+
+        .btn {
+            display: inline-block;
+            height: 50px;
+            width: 160px;
+            padding: 12px 18px;
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            text-decoration: none;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+            border: none;
+            outline: none;
+        }
+
+        .btn:hover {
+            background: linear-gradient(45deg, #0056b3, #003b80);
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(0, 91, 255, 0.6);
+        }
+
+        .organization-card::before {
+            content: "";
+            position: absolute;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            top: -90px;
+            background: rgba(0, 123, 255, 0.3);
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .organization-card:hover::before {
+            transform: translateX(-50%) scale(1.2);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <img src="/static/images/logo.png" alt="Alterra" class="logo-img">
+                <span class="logo-text">Alterra</span>
+            </div>
+            <nav class="nav">
+                <a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Пожертвования</a>
+                <a href="{{ url_for('volunteering') }}" class="{% if request.endpoint == 'volunteering' %}active{% endif %}">Волонтёрства</a>
+                <a href="{{ url_for('organizations') }}" class="{% if request.endpoint == 'organizations' %}active{% endif %}">Организации</a>
+            </nav>
+            <div class="user-profile">
+                {% if session.get('user_id') %}
+                    <a href="{{ url_for('profile') }}">
+                        <img src="{{ user['avatar'] if user['avatar'] else '/static/images/default_avatar.png' }}" 
+                            alt="{{ session['username'] }}" class="user-avatar">
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">
+                        <img src="/static/images/user.png" alt="Гость" class="user-avatar">
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        {% for organization in organizations %}
+        <div class="organization-card">
+            <img src="{{ organization['image_url'] }}" alt="{{ organization['name'] }}">
+            <div class="card-content">
+                <div>
+                    <h2>{{ organization['name'] }}</h2>
+                    <p>{{ organization['description'] }}</p>
+                </div>
+                <div class="btndiv">
+                    <button class="btn" onclick="followOrganization({{ organization['id'] }})">
+                        Подписаться
+                    </button>     
+                </div>               
+            </div>
+        </div>
+        {% endfor %}
+    </main>
+
+    <script>
+        function followOrganization(organizationId) {
+            fetch(`/follow_organization/${organizationId}`, { 
+                method: "POST",
+                headers: { "Content-Type": "application/json" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Вы подписались на организацию!");
+                    location.reload();
+                } else {
+                    alert("Ошибка: " + data.error);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
