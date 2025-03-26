@@ -92,32 +92,7 @@
 </style>
 <body>
     <div class="container">
-        <header class="header">
-            <div class="header-container">
-                <div class="logo">
-                    <img src="/static/images/logo.png" alt="Alterra" class="logo-img">
-                    <span class="logo-text">Alterra</span>
-                </div>
-                <nav class="nav">
-                    <a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Пожертвования</a>
-                    <a href="{{ url_for('volunteering') }}" class="{% if request.endpoint == 'volunteering' %}active{% endif %}">Волонтёрства</a>
-                    <a href="{{ url_for('leaderboard') }}" class="{% if request.endpoint == 'organizations' %}active{% endif %}">Организации</a>
-                </nav>
-                <div class="user-profile">
-                    {% if session.get('user_id') %}
-                        <a href="{{ url_for('profile') }}">
-                            <img src="{{ user['avatar'] if user['avatar'] else '/static/images/default_avatar.png' }}" 
-                                 alt="{{ session['username'] }}" class="user-avatar">
-                        </a>
-                        <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
-                    {% else %}
-                        <a href="{{ url_for('login') }}">
-                            <img src="/static/images/user.png" alt="Гость" class="user-avatar">
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
-        </header>
+        {% include 'header.html' %}
 
         <main>
             <!-- 🔹 Карусель кампаний -->
@@ -250,19 +225,7 @@
 
     </div>
 
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-logo">
-                <img src="/static/images/logo.png" alt="Alterra" class="footer-logo-img">
-                <span class="footer-logo-text">Alterra</span>
-            </div>
-            <div class="footer-info">
-                <p><strong>Наш адрес:</strong><br>Медерова 123/4</p>
-                <p><strong>Общие вопросы:</strong><br>+773-34-64-64</p>
-                <p><strong>Отдел по сбору средств:</strong><br>+772-16-99-55<br>+509-66-97-90</p>
-            </div>
-        </div>
-    </footer>
+    {% include 'footer.html' %}
 
     <script>
         let currentSlide = 0;

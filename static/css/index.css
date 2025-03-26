@@ -1,0 +1,235 @@
+h1{
+    color: white;
+}
+
+.ads-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.ad-card {
+    display: flex;
+    align-items: stretch;
+    width: 800px; 
+    height: 150px; 
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    cursor: pointer;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.ad-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.ad-card img {
+    width: 250px;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 15px 0 0 15px;
+}
+
+.ad-content {
+    flex: 1;
+    padding: 15px;
+    color: black;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.ad-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.ad-btn {
+    display: inline-block;
+    padding: 8px 15px;
+    background: rgba(0, 0, 0, 0.1);
+    color: black;
+    border-radius: 5px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background 0.3s;
+    text-align: center;
+    width: fit-content;
+}
+
+.ad-btn:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Основные стили страницы Alterra */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+/* 🔹 Карусель кампаний */
+.carousel {
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+.slide {
+    flex: 0 0 100%;
+    display: none;
+}
+.campaign {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    margin-bottom: 20px;
+}
+.campaign h2 {
+    color: #333;
+}
+.progress-bar {
+    height: 10px;
+    background: #e0e0e0;
+    border-radius: 5px;
+    margin: 10px 0;
+    overflow: hidden;
+}
+.progress-bar div {
+    height: 100%;
+    background: #4caf50;
+}
+.btn {
+    background: #ff6600;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    color: #fff;
+    font-size: 16px;
+}
+.btn:hover {
+    background: #e55b00;
+}
+
+/* 🔹 Галерея изображений внутри кампании */
+.image-slider {
+    position: relative;
+    width: 100%;
+    text-align: center;
+}
+.image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+.campaign-image {
+    max-width: 100%;
+    border-radius: 10px;
+    transition: opacity 0.5s ease-in-out;
+}
+.hidden {
+    display: none;
+}
+
+/* 🔹 Форма поиска */
+.search-container {
+    margin: 20px 0;
+    text-align: center;
+}
+.search-box {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 5px;
+    max-width: 300px;
+    margin: 0 auto;
+}
+.search-box input {
+    border: none;
+    outline: none;
+    padding: 5px;
+    flex-grow: 1;
+}
+.search-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* 🔹 Кампании в сетке */
+.container_l {
+    padding: 40px 0;
+}
+.campaign-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+.campaign-card {
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+.campaign-card img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+/* 🔹 Реклама */
+.ads-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 40px;
+}
+.ad-card {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    width: 250px;
+}
+.ad-card img {
+    max-width: 100%;
+    border-radius: 10px;
+}
+.ad-btn {
+    display: inline-block;
+    background: #007bff;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+.ad-btn:hover {
+    background: #0056b3;
+}

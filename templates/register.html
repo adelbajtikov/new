@@ -52,39 +52,9 @@
     </style>
 </head>
 <body>
-      <!-- Header -->
-        <header class="header">
-            <div class="header-container">
-                <!-- Логотип -->
-                <div class="logo">
-                    <img src="/static/images/logo.png" alt="Alterra" class="logo-img">
-                    <span class="logo-text">Alterra</span>
-                </div>
-    
-                <!-- Навигация -->
-                <nav class="nav">
-                    <a href="{{url_for('home')}}">Пожертвования</a>
-                    <a href="{{ url_for('volunteering') }}">Волонтёрства</a>
-                    <a href="{{url_for('organizations')}}">Организации</a>
-                </nav>
-    
-                <!-- Аватар пользователя -->
-                <div class="user-profile">
-                    {% if session.get('user_id') %}
-                        <a href="{{ url_for('profile') }}">
-                            <img src="{{ user['avatar'] if user['avatar'] else '/static/images/default_avatar.png' }}" 
-                                 alt="{{ session['username'] }}" class="user-avatar">
-                        </a>
-                        <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
-                    {% else %}
-                        <a href="{{ url_for('login') }}">
-                            <img src="/static/images/user.png" alt="Гость" class="user-avatar">
-                        </a>
-                    {% endif %}
-                </div>
-                
-            </div>
-        </header>
+
+        {% include 'header.html' %}
+
         <div class="form-container">
         <h1>Регистрация</h1>
     

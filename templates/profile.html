@@ -9,37 +9,8 @@
 </head>
 <body>
 
-    <!-- 🔹 HEADER -->
-    <header class="header">
-        <div class="header-container">
-            <!-- Логотип -->
-            <div class="logo">
-                <img src="/static/images/logo.png" alt="Alterra" class="logo-img">
-                <span class="logo-text">Alterra</span>
-            </div>
+    {% include 'header.html' %}
 
-            <!-- Навигация -->
-            <nav class="nav">
-                <a href="{{ url_for('home') }}">Пожертвования</a>
-                <a href="{{ url_for('volunteering') }}">Волонтёрства</a>
-                <a href="{{ url_for('organizations') }}">Организации</a>
-            </nav>
-
-            <!-- Аватар и выход -->
-            <div class="user-profile">
-                {% if session.get('user_id') %}
-                    <a href="{{ url_for('profile') }}">
-                        <img src="{{ user['avatar'] if user['avatar'] else '/static/images/default_avatar.png' }}" class="user-avatar">
-                    </a>
-                    <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
-                {% else %}
-                    <a href="{{ url_for('login') }}">
-                        <img src="/static/images/user.png" alt="Гость" class="user-avatar">
-                    </a>
-                {% endif %}
-            </div>
-        </div>
-    </header>
     <div class="profile-container">
         <!-- Убираем h1, если он не нужен визуально (или переименуйте / спрячьте) -->
         <!-- <h1>Профиль пользователя</h1> -->
