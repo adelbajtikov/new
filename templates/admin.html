@@ -6,164 +6,595 @@
     <title>Админ Панель</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #007BFF;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --dark: #343a40;
+            --light: #f8f9fa;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
-            padding: 0;
-        }
-        .container {
-            width: 80%;
-            margin: auto;
-            background: white;
             padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+        
+        .container {
+            width: 95%;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
-            text-align: center;
+            position: relative;
         }
+        
+        h1, h2 {
+            text-align: center;
+            color: var(--dark);
+            margin-bottom: 25px;
+        }
+        
         h1 {
-            text-align: center;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
         }
+        
+        .table-container {
+            overflow-x: auto;
+            margin: 25px 0;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+        
         .table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            font-size: 14px;
+            min-width: 800px;
         }
+        
         .table th, .table td {
-            border: 1px solid #ddd;
-            padding: 10px;
+            padding: 12px 15px;
             text-align: left;
+            border-bottom: 1px solid #ddd;
         }
+        
         .table th {
-            background-color: #007BFF;
+            background-color: var(--primary);
             color: white;
+            position: sticky;
+            top: 0;
+            font-weight: 600;
         }
+        
+        .table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .table tr:hover {
+            background-color: #f1f1f1;
+        }
+        
         .btn {
-            padding: 5px 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 12px;
             border: none;
             cursor: pointer;
-            border-radius: 5px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            margin: 2px;
         }
+        
+        .btn i {
+            margin-right: 5px;
+        }
+        
         .btn-danger {
-            background-color: #dc3545;
+            background-color: var(--danger);
             color: white;
         }
+        
         .btn-success {
-            background-color: #28a745;
+            background-color: var(--success);
             color: white;
         }
+        
         .btn-primary {
-            background-color: #007BFF;
+            background-color: var(--primary);
             color: white;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: #212529;
+        }
+        
+        .btn-info {
+            background-color: var(--info);
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .status {
+            display: inline-flex;
+            align-items: center;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .status-pending {
+            color: #ff9800;
+            background-color: #fff3e0;
+        }
+        
+        .status-confirmed {
+            color: #4caf50;
+            background-color: #e8f5e9;
+        }
+        
+        .status-rejected {
+            color: #f44336;
+            background-color: #ffebee;
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .logout-btn {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-user {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .badge-org {
+            background-color: var(--info);
+            color: white;
+        }
+        
+        .badge-active {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .badge-blocked {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .amount {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .nav-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .nav-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+        }
+        
+        .nav-tab.active {
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                margin: 2px 0;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Админ Панель</h1>
+        <h1><i class="fas fa-user-shield"></i> Админ Панель</h1>
+        <a href="{{ url_for('admin_logout') }}" class="btn btn-danger logout-btn">
+            <i class="fas fa-sign-out-alt"></i> Выйти
+        </a>
         
-        <h2>Пользователи и Организации</h2>
-        <table class="table">
-            <tr>
-                <th>ID</th>
-                <th>Имя</th>
-                <th>Тип</th>
-                <th>Статус</th>
-                <th>Действие</th>
-            </tr>
-            {% for user in users %}
-            <tr>
-                <td>{{ user.id }}</td>
-                <td>{{ user.username }}</td>
-                <td>Пользователь</td>
-                <td>{% if user.blocked %}🔴 Заблокирован{% else %}🟢 Активен{% endif %}</td>
-                <td>
-                    {% if user.blocked %}
-                        <button class="btn btn-success" onclick="unblockUser({{ user.id }})">Разблокировать</button>
-                    {% else %}
-                        <button class="btn btn-danger" onclick="blockUser({{ user.id }})">Заблокировать</button>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-            {% for org in organizations %}
-            <tr>
-                <td>{{ org.id }}</td>
-                <td>{{ org.name }}</td>
-                <td>Организация</td>
-                <td>{% if org.blocked %}🔴 Заблокирована{% else %}🟢 Активна{% endif %}</td>
-                <td>
-                    {% if org.blocked %}
-                        <button class="btn btn-success" onclick="unblockOrganization({{ org.id }})">Разблокировать</button>
-                    {% else %}
-                        <button class="btn btn-danger" onclick="blockOrganization({{ org.id }})">Заблокировать</button>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="switchTab('users')">
+                <i class="fas fa-users"></i> Пользователи
+            </div>
+            <div class="nav-tab" onclick="switchTab('donations')">
+                <i class="fas fa-donate"></i> Пожертвования
+            </div>
+            <div class="nav-tab" onclick="switchTab('ads')">
+                <i class="fas fa-ad"></i> Реклама
+            </div>
+        </div>
         
-        <h2>Донаты</h2>
-        <table class="table">
-            <tr>
-                <th>ID</th>
-                <th>Кампания</th>
-                <th>Сумма</th>
-                <th>Дата</th>
-                <th>ID донора</th>
-                <th>Чек</th>
-            </tr>
-            {% for donation in donations %}
-            <tr>
-                <td>{{ donation.id }}</td>
-                <td>{{ donation.campaign_title }}</td>
-                <td>{{ donation.amount }}</td>
-                <td>{{ donation.created_at }}</td>
-                <td>{{ donation.user_id }}</td>
-                <td>
-                    <a href="{{ url_for('view_receipt', donation_id=donation.id) }}" class="btn btn-primary">Посмотреть чек</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-        <a href="{{ url_for('manage_ads') }}" class="btn btn-primary">Управление рекламой</a>
-        <a href="{{ url_for('admin_logout') }}" class="btn btn-danger" style="position: absolute; top: 20px; right: 20px;">
-            Выйти
-        </a>        
+        <div id="users-tab" class="tab-content active">
+            <div class="section">
+                <h2><i class="fas fa-users-cog"></i> Управление пользователями</h2>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Имя</th>
+                                <th>Тип</th>
+                                <th>Статус</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>{{ user.id }}</td>
+                                <td>{{ user.username }}</td>
+                                <td><span class="badge badge-user"><i class="fas fa-user"></i> Пользователь</span></td>
+                                <td>
+                                    {% if user.blocked %}
+                                        <span class="badge badge-blocked"><i class="fas fa-ban"></i> Заблокирован</span>
+                                    {% else %}
+                                        <span class="badge badge-active"><i class="fas fa-check-circle"></i> Активен</span>
+                                    {% endif %}
+                                </td>
+                                <td class="action-buttons">
+                                    {% if user.blocked %}
+                                        <button class="btn btn-success" onclick="unblockUser({{ user.id }})">
+                                            <i class="fas fa-unlock"></i> Разблокировать
+                                        </button>
+                                    {% else %}
+                                        <button class="btn btn-danger" onclick="blockUser({{ user.id }})">
+                                            <i class="fas fa-lock"></i> Заблокировать
+                                        </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% for org in organizations %}
+                            <tr>
+                                <td>{{ org.id }}</td>
+                                <td>{{ org.name }}</td>
+                                <td><span class="badge badge-org"><i class="fas fa-building"></i> Организация</span></td>
+                                <td>
+                                    {% if org.blocked %}
+                                        <span class="badge badge-blocked"><i class="fas fa-ban"></i> Заблокирована</span>
+                                    {% else %}
+                                        <span class="badge badge-active"><i class="fas fa-check-circle"></i> Активна</span>
+                                    {% endif %}
+                                </td>
+                                <td class="action-buttons">
+                                    {% if org.blocked %}
+                                        <button class="btn btn-success" onclick="unblockOrganization({{ org.id }})">
+                                            <i class="fas fa-unlock"></i> Разблокировать
+                                        </button>
+                                    {% else %}
+                                        <button class="btn btn-danger" onclick="blockOrganization({{ org.id }})">
+                                            <i class="fas fa-lock"></i> Заблокировать
+                                        </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div id="donations-tab" class="tab-content">
+            <div class="section">
+                <h2><i class="fas fa-hand-holding-usd"></i> Управление пожертвованиями</h2>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Кампания</th>
+                                <th>Сумма</th>
+                                <th>Дата</th>
+                                <th>Донор</th>
+                                <th>Статус</th>
+                                <th>Чек</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for donation in donations %}
+                            <tr>
+                                <td>{{ donation.id }}</td>
+                                <td>{{ donation.campaign_title }}</td>
+                                <td class="amount">{{ "%.2f"|format(donation.amount) }} ₽</td>
+                                <td>{{ donation.created_at }}</td>
+                                <td>
+                                    {% if donation.user_id %}
+                                        ID: {{ donation.user_id }}
+                                    {% else %}
+                                        Аноним
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if donation.status == 'confirmed' %}
+                                        <span class="status status-confirmed">
+                                            <i class="fas fa-check-circle"></i> Подтверждено
+                                        </span>
+                                    {% elif donation.status == 'rejected' %}
+                                        <span class="status status-rejected">
+                                            <i class="fas fa-times-circle"></i> Отклонено
+                                        </span>
+                                    {% else %}
+                                        <span class="status status-pending">
+                                            <i class="fas fa-clock"></i> Ожидает
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('view_receipt', donation_id=donation.id) }}" 
+                                       class="btn btn-primary">
+                                        <i class="fas fa-file-invoice"></i> Просмотр
+                                    </a>
+                                </td>
+                                <td class="action-buttons">
+                                    {% if donation.status != 'confirmed' %}
+                                    <button class="btn btn-success" onclick="confirmDonation({{ donation.id }})">
+                                        <i class="fas fa-check"></i> Подтвердить
+                                    </button>
+                                    {% endif %}
+                                    {% if donation.status != 'rejected' %}
+                                    <button class="btn btn-danger" onclick="rejectDonation({{ donation.id }})">
+                                        <i class="fas fa-times"></i> Отклонить
+                                    </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div id="ads-tab" class="tab-content">
+            <div class="section">
+                <h2><i class="fas fa-ad"></i> Управление рекламой</h2>
+                <div class="text-center">
+                    <a href="{{ url_for('manage_ads') }}" class="btn btn-primary">
+                        <i class="fas fa-cog"></i> Перейти к управлению рекламой
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script>
-        function blockUser(userId) {
-            fetch(`/admin/block_user/${userId}`, { method: 'POST' })
-              .then(response => response.json())
-              .then(data => {
-                  alert(data.message);
-                  location.reload();
-              });
+        // Переключение между вкладками
+        function switchTab(tabName) {
+            // Скрыть все вкладки
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Убрать активный класс у всех кнопок
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Показать выбранную вкладку
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            // Добавить активный класс к выбранной кнопке
+            event.currentTarget.classList.add('active');
         }
-        function unblockUser(userId) {
-            fetch(`/admin/unblock_user/${userId}`, { method: 'POST' })
-              .then(response => response.json())
-              .then(data => {
-                  alert(data.message);
-                  location.reload();
-              });
+        
+        // Система уведомлений
+        function showAlert(message, type = 'success') {
+            const alert = document.createElement('div');
+            alert.style.position = 'fixed';
+            alert.style.top = '20px';
+            alert.style.right = '20px';
+            alert.style.padding = '15px 20px';
+            alert.style.borderRadius = '5px';
+            alert.style.color = 'white';
+            alert.style.backgroundColor = type === 'success' ? '#28a745' : 
+                                          type === 'error' ? '#dc3545' : '#17a2b8';
+            alert.style.zIndex = '10000';
+            alert.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            alert.style.display = 'flex';
+            alert.style.alignItems = 'center';
+            alert.style.gap = '10px';
+            alert.style.animation = 'slideIn 0.3s ease-out';
+            alert.style.fontWeight = '500';
+            
+            const icon = document.createElement('i');
+            icon.className = type === 'success' ? 'fas fa-check-circle' : 
+                             type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-info-circle';
+            
+            const text = document.createElement('span');
+            text.textContent = message;
+            
+            alert.appendChild(icon);
+            alert.appendChild(text);
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => {
+                    document.body.removeChild(alert);
+                }, 300);
+            }, 3000);
         }
-        function blockOrganization(orgId) {
-            fetch(`/admin/block_organization/${orgId}`, { method: "POST" })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    location.reload();
+        
+        // Добавляем стили для анимации
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Обработчик ответов от сервера
+        async function handleResponse(response, successMessage) {
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.error || 'Произошла ошибка');
+            }
+            
+            showAlert(successMessage || data.message, 'success');
+            setTimeout(() => location.reload(), 1500);
+            return data;
+        }
+        
+        // Обработчик ошибок
+        function handleError(error) {
+            console.error('Error:', error);
+            showAlert(error.message || 'Произошла ошибка', 'error');
+        }
+        
+        // Блокировка пользователя
+        async function blockUser(userId) {
+            try {
+                const response = await fetch(`/admin/block_user/${userId}`, { 
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' }
                 });
+                await handleResponse(response, 'Пользователь успешно заблокирован');
+            } catch (error) {
+                handleError(error);
+            }
         }
-        function unblockOrganization(orgId) {
-            fetch(`/admin/unblock_organization/${orgId}`, { method: "POST" })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    location.reload();
+        
+        // Разблокировка пользователя
+        async function unblockUser(userId) {
+            try {
+                const response = await fetch(`/admin/unblock_user/${userId}`, { 
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' }
                 });
+                await handleResponse(response, 'Пользователь успешно разблокирован');
+            } catch (error) {
+                handleError(error);
+            }
+        }
+        
+        // Блокировка организации
+        async function blockOrganization(orgId) {
+            try {
+                const response = await fetch(`/admin/block_organization/${orgId}`, { 
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' }
+                });
+                await handleResponse(response, 'Организация успешно заблокирована');
+            } catch (error) {
+                handleError(error);
+            }
+        }
+        
+        // Разблокировка организации
+        async function unblockOrganization(orgId) {
+            try {
+                const response = await fetch(`/admin/unblock_organization/${orgId}`, { 
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' }
+                });
+                await handleResponse(response, 'Организация успешно разблокирована');
+            } catch (error) {
+                handleError(error);
+            }
+        }
+        
+        // Подтверждение пожертвования
+        async function confirmDonation(donationId) {
+            if (!confirm('Вы уверены, что хотите подтвердить это пожертвование?')) return;
+            
+            try {
+                const response = await fetch(`/admin/confirm_donation/${donationId}`, { 
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' }
+                });
+                await handleResponse(response, 'Пожертвование успешно подтверждено');
+            } catch (error) {
+                handleError(error);
+            }
+        }
+        
+        // Отклонение пожертвования
+        async function rejectDonation(donationId) {
+            if (!confirm('Вы уверены, что хотите отклонить это пожертвование?')) return;
+            
+            try {
+                const response = await fetch(`/admin/reject_donation/${donationId}`, { 
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' }
+                });
+                await handleResponse(response, 'Пожертвование успешно отклонено');
+            } catch (error) {
+                handleError(error);
+            }
         }
     </script>
 </body>

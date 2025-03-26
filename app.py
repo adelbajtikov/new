@@ -15,6 +15,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import fitz  # PyMuPDF - работа с PDF
 app = Flask(__name__)
 UPLOAD_FOLDER = 'static/uploads'
+RECEIPTS_FOLDER = 'static/uploads/receipts'
+os.makedirs(RECEIPTS_FOLDER, exist_ok=True)  # Создаёт папку, если её нет
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER 
@@ -28,22 +30,89 @@ def get_db_connection():
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
-
-@app.route('/admin', methods=['GET'])
+@app.route('/leaderboard')
+def leaderboard():
+    top_users = get_db_connection().execute("""
+        SELECT id, username, avatar, blocked 
+        FROM users 
+        ORDER BY blocked DESC NULLS LAST 
+        LIMIT 50
+    """).fetchall()
+    
+    return render_template('leaderboard.html', top_users=top_users)
+@app.route('/admin')
 def admin_dashboard():
     if 'admin' not in session:
         return redirect(url_for('login'))
     
     conn = get_db_connection()
-    users = conn.execute("SELECT id, username, blocked FROM users").fetchall()
-    ads = conn.execute("SELECT * FROM ads").fetchall()
-    organizations = conn.execute("SELECT id, name, blocked FROM organizations").fetchall()
-    donations = conn.execute("SELECT d.id, d.amount, d.created_at, d.message, d.user_id, c.title as campaign_title FROM donations d JOIN campaigns c ON d.campaign_id = c.id").fetchall()
+    
+    try:
+        users = conn.execute("SELECT id, username, blocked FROM users").fetchall()
+        organizations = conn.execute("SELECT id, name, blocked FROM organizations").fetchall()
+        
+        # Исправленный запрос для донатов
+        donations = conn.execute("""
+            SELECT 
+                d.id, 
+                d.amount, 
+                d.created_at, 
+                d.user_id,
+                c.title as campaign_title,
+                d.receipt_path
+            FROM donations d
+            LEFT JOIN campaigns c ON d.campaign_id = c.id
+            ORDER BY d.created_at DESC
+        """).fetchall()
+        
+        return render_template(
+            'admin.html',
+            users=users,
+            organizations=organizations,
+            donations=donations
+        )
+    except Exception as e:
+        print(f"Ошибка: {e}")
+        return "Ошибка сервера", 500
+    finally:
+        conn.close()
+
+@app.route('/admin/confirm_donation/<int:donation_id>', methods=['POST'])
+def confirm_donation(donation_id):
+    if 'admin' not in session:
+        return jsonify({'error': 'Доступ запрещен'}), 403
+    
+    conn = get_db_connection()
+    
+    # Получаем сумму пожертвования
+    donation = conn.execute('SELECT amount, campaign_id FROM donations WHERE id = ?', (donation_id,)).fetchone()
+    
+    # Обновляем статус
+    conn.execute("UPDATE donations SET status = 'confirmed' WHERE id = ?", (donation_id,))
+    
+    # Обновляем собранную сумму в кампании
+    conn.execute('''
+        UPDATE campaigns 
+        SET collected = collected + ? 
+        WHERE id = ?
+    ''', (donation['amount'], donation['campaign_id']))
+    
+    conn.commit()
     conn.close()
     
-    
-    return render_template('admin.html', users=users, organizations=organizations, donations=donations, ads = ads)
+    return jsonify({'success': True, 'message': 'Пожертвование подтверждено'})
 
+@app.route('/admin/reject_donation/<int:donation_id>', methods=['POST'])
+def reject_donation(donation_id):
+    if 'admin' not in session:
+        return jsonify({'error': 'Доступ запрещен'}), 403
+    
+    conn = get_db_connection()
+    conn.execute("UPDATE donations SET status = 'rejected' WHERE id = ?", (donation_id,))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'success': True, 'message': 'Пожертвование отклонено'})
 
 
 @app.route('/admin/logout')
@@ -67,13 +136,21 @@ def block_user(user_id):
 @app.route('/admin/view_receipt/<int:donation_id>')
 def view_receipt(donation_id):
     conn = get_db_connection()
-    donation = conn.execute("SELECT d.id, d.amount, d.created_at, d.message, c.title as campaign_title FROM donations d JOIN campaigns c ON d.campaign_id = c.id WHERE d.id = ?", (donation_id,)).fetchone()
+    donation = conn.execute("""
+        SELECT d.id, d.amount, d.created_at, d.message, d.receipt_path, 
+               c.title as campaign_title 
+        FROM donations d 
+        JOIN campaigns c ON d.campaign_id = c.id 
+        WHERE d.id = ?
+    """, (donation_id,)).fetchone()
     conn.close()
-    
+    donation = dict(donation)  # Преобразуем sqlite.Row в словарь
+    donation["receipt_path"] = donation["receipt_path"].replace("\\", "/")
     if not donation:
         return "Чек не найден", 404
     
     return render_template('receipt.html', donation=donation)
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 @app.route('/admin/unblock_user/<int:user_id>', methods=['POST'])
@@ -144,16 +221,18 @@ def recommend_volunteering(opportunity_id):
     recommendations = get_similar_volunteering(opportunity_id)
     return jsonify(recommendations)
 
+# В тех местах, где выводится сумма собранных средств
 @app.route('/campaign/<int:campaign_id>')
 def campaign_details(campaign_id):
     conn = get_db_connection()
-    campaign = conn.execute('SELECT * FROM campaigns WHERE id = ?', (campaign_id,)).fetchone()
+    campaign = conn.execute('''
+        SELECT *, 
+        (SELECT SUM(amount) FROM donations 
+         WHERE campaign_id = ? AND status = 'confirmed') as collected
+        FROM campaigns WHERE id = ?
+    ''', (campaign_id, campaign_id)).fetchone()
     conn.close()
-
-    if not campaign:
-        return "Кампания не найдена", 404
-
-    return render_template('campaign_details.html', campaign=campaign)
+    # ...
 @app.route('/volunteering/<int:opportunity_id>')
 def volunteering_details(opportunity_id):
     conn = get_db_connection()
@@ -302,32 +381,49 @@ def home():
 def donate(campaign_id):
     conn = get_db_connection()
     campaign = conn.execute('SELECT * FROM campaigns WHERE id = ?', (campaign_id,)).fetchone()
+    user_id = session.get('user_id')
+    user = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone() if user_id else None
 
     if not campaign:
         conn.close()
         return "Кампания не найдена", 404
 
-    user_id = session.get('user_id')
-    user = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone() if user_id else None
-
     if request.method == 'POST':
-        name = request.form['name']
-        amount = float(request.form['amount'])
-        message = request.form.get('message', '')
+        try:
+            name = request.form['name']
+            amount = float(request.form['amount'])
+            message = request.form.get('message', '')
 
-        conn.execute(
-            'INSERT INTO donations (campaign_id, name, amount, message, user_id) VALUES (?, ?, ?, ?, ?)',
-            (campaign_id, name, amount, message, user_id)
-        )
-        conn.execute('UPDATE campaigns SET collected = collected + ? WHERE id = ?', (amount, campaign_id))
-        conn.commit()
-        conn.close()
+            # Обработка файла чека
+            if 'receipt' not in request.files:
+                return jsonify({'success': False, 'error': 'Чек обязателен'}), 400
 
-        return jsonify({"success": True})  # ✅ JSON-ответ для AJAX
+            receipt = request.files['receipt']
+            if receipt.filename == '':
+                return jsonify({'success': False, 'error': 'Файл не выбран'}), 400
 
-    conn.close()
-    return render_template('donate.html', campaign=campaign, user=user)  # ✅ Отображаем форму при GET
+            if receipt and allowed_file(receipt.filename):
+                filename = secure_filename(receipt.filename)
+                filepath = os.path.join(RECEIPTS_FOLDER, filename)
+                receipt.save(filepath)
 
+                # Сохраняем в базу
+                conn.execute(
+                    '''INSERT INTO donations 
+                    (campaign_id, name, amount, message, user_id, receipt_path, status, created_at) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
+                    (campaign_id, name, amount, message, user_id, filepath, 'pending', datetime.now())
+                )
+                conn.commit()
+                conn.close()
+                return jsonify({'success': True})
+            else:
+                return jsonify({'success': False, 'error': 'Недопустимый формат файла'}), 400
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    # GET-запрос - показываем форму
+    return render_template('donate.html', campaign=campaign, user=user)
 @app.route('/get_payment_history')
 def get_payment_history():
     if not session.get('user_id'):

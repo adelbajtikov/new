@@ -4,32 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Пожертвовать</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
     <div class="container">
         <header class="header">
             <div class="header-container">
                 <div class="logo">
-                    <img src="/static/images/logo.png" alt="Alterra" class="logo-img">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Alterra" class="logo-img">
                     <span class="logo-text">Alterra</span>
                 </div>
 
                 <nav class="nav">
-                    <a href="{{url_for('home')}}">Пожертвования</a>
+                    <a href="{{ url_for('home') }}">Пожертвования</a>
                     <a href="{{ url_for('volunteering') }}">Волонтёрства</a>
-                    <a href="{{url_for('organizations')}}">Организации</a>
+                    <a href="{{ url_for('organizations') }}">Организации</a>
                 </nav>
 
                 <div class="user-profile">
                     {% if user %}
                         <a href="{{ url_for('profile') }}">
-                            <img src="{{ user['avatar'] if user['avatar'] else '/static/images/default_avatar.png' }}" class="user-avatar">
+                            <img src="{{ url_for('static', filename=user['avatar']) if user['avatar'] else url_for('static', filename='images/default_avatar.png') }}" class="user-avatar">
                         </a>
                         <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
                     {% else %}
                         <a href="{{ url_for('login') }}">
-                            <img src="/static/images/user.png" alt="Гость" class="user-avatar">
+                            <img src="{{ url_for('static', filename='images/user.png') }}" alt="Гость" class="user-avatar">
                         </a>
                     {% endif %}
                 </div>
@@ -47,7 +47,7 @@
 
                 <div class="payment-details">
                     <h2>Реквизиты для оплаты</h2>
-                    <button class = 'detailsbutton' onclick="openDetailsModal()">Показать реквизиты</button>
+                    <button class="detailsbutton" onclick="openDetailsModal()">Показать реквизиты</button>
                 </div>
 
                 <form id="donation-form" class="donate-form" enctype="multipart/form-data">
@@ -74,7 +74,9 @@
             <div class="modal-content">
                 <span class="close" onclick="closeThankYouModal()">&times;</span>
                 <h2>Спасибо за ваш вклад!</h2>
-                <p>Ваше пожертвование было успешно отправлено.</p>
+                <p>Ваше пожертвование отправлено на проверку администратору.</p>
+                <p>После подтверждения оно будет зачислено на счет кампании.</p>
+                <p>Вы будете перенаправлены на главную страницу через <span id="countdown">3</span> секунды...</p>
             </div>
         </div>
 
@@ -82,9 +84,9 @@
             <div class="modal-content">
                 <span class="close" onclick="closeDetailsModal()">&times;</span>
                 <h2>Реквизиты</h2>
-                <img class="banklogo" src="/static/images/mbank.png" alt="">
-                <img class='banklogo' src="/static/images/elsom.png" alt="">
-                <img class='banklogo' src="/static/images/optima.png" alt="">
+                <img class="banklogo" src="{{ url_for('static', filename='images/mbank.png') }}" alt="">
+                <img class="banklogo" src="{{ url_for('static', filename='images/elsom.png') }}" alt="">
+                <img class="banklogo" src="{{ url_for('static', filename='images/optima.png') }}" alt="">
                 <p><strong>{{ campaign['payment_details'] }}</strong></p>
             </div>
         </div>
@@ -92,7 +94,7 @@
         <footer class="footer">
             <div class="footer-container">
                 <div class="footer-logo">
-                    <img src="/static/images/logo.png" alt="Alterra" class="footer-logo-img">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Alterra" class="footer-logo-img">
                     <span class="footer-logo-text">Alterra</span>
                 </div>
                 <div class="footer-info">
@@ -108,19 +110,41 @@
         document.getElementById("donation-form").addEventListener("submit", function(event) {
             event.preventDefault();
             let formData = new FormData(this);
+            
             fetch("/donate/" + document.getElementById("campaign_id").value, {
                 method: "POST",
                 body: formData
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     document.getElementById("thankYouModal").style.display = "block";
+                    
+                    // Обратный отсчет перед перенаправлением
+                    let seconds = 3;
+                    const countdownElement = document.getElementById("countdown");
+                    const countdownInterval = setInterval(function() {
+                        seconds--;
+                        countdownElement.textContent = seconds;
+                        
+                        if (seconds <= 0) {
+                            clearInterval(countdownInterval);
+                            window.location.href = "{{ url_for('home') }}";
+                        }
+                    }, 1000);
                 } else {
-                    alert("Ошибка: " + data.error);
+                    alert("Ошибка: " + (data.error || "Неизвестная ошибка"));
                 }
             })
-            .catch(error => console.error("Ошибка:", error));
+            .catch(error => {
+                console.error("Ошибка:", error);
+                alert("Произошла ошибка при отправке формы");
+            });
         });
 
         function openDetailsModal() {
@@ -133,10 +157,15 @@
 
         function closeThankYouModal() {
             document.getElementById("thankYouModal").style.display = "none";
+            window.location.href = "{{ url_for('home') }}";
         }
     </script>
 
     <style>
+        #countdown {
+            font-weight: bold;
+            color: #955cb8;
+        }
         .modal, .modal2 {
             display: none;
             position: fixed;
@@ -163,8 +192,8 @@
             font-size: 28px;
             cursor: pointer;
         }
-        .banklogo{
-            height:40px;
+        .banklogo {
+            height: 40px;
             margin: 10px;
         }
         .detailsbutton {
@@ -182,7 +211,6 @@
             box-shadow: 0 0 7px 3px rgba(0, 0, 0, 0.2);
             transform: translateY(-3px);
         }
-
     </style>
 </body>
 </html>
