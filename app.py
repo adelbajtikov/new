@@ -30,6 +30,8 @@ def get_db_connection():
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
+
+
 @app.route('/leaderboard')
 def leaderboard():
     top_users = get_db_connection().execute("""
@@ -38,8 +40,18 @@ def leaderboard():
         ORDER BY blocked DESC NULLS LAST 
         LIMIT 50
     """).fetchall()
-    
-    return render_template('leaderboard.html', top_users=top_users)
+
+    conn = get_db_connection()
+
+    user = None
+
+    if session.get("user_id"):
+        user = conn.execute(
+            "SELECT * FROM users WHERE id = ?", (session["user_id"],)
+        ).fetchone()
+
+    return render_template('leaderboard.html', top_users=top_users, user=user)
+
 @app.route('/admin')
 def admin_dashboard():
     if 'admin' not in session:
