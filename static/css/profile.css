@@ -299,28 +299,6 @@ h2 {
 
 
 
-.header {
-    background-color: #fff;
-    border-bottom: 2px solid #e0e0e0;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Контейнер для хедера */
-.header-container {
-    width: 100%;
-    max-width: 1200px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
 
 /* Логотип */
 .logo {

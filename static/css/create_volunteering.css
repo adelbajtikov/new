@@ -11,7 +11,7 @@
         /* 🔹 Общие стили */
         body {
             font-family: Arial, sans-serif;
-            background-color: #2e004b; /* Тёмно-фиолетовый */
+            background-color: #714C8D;
             color: #fff;
             text-align: center;
             margin: 0;
@@ -152,7 +152,7 @@
 
 /* 🔹 КНОПКИ */
 .btn {
-    background-color: #ffd700;
+    background-color: #ff9800;
     color: #2e004b;
     font-size: 18px;
     font-weight: bold;
@@ -165,7 +165,7 @@
 }
 
 .btn:hover {
-    background-color: #ffcc00;
+    background-color: #e68a00;
 }
 
 /* 🔹 СТИЛЬ ДЛЯ ФОРМЫ */
@@ -192,7 +192,7 @@ input, textarea {
 }
 
 input:focus, textarea:focus {
-    outline: 2px solid #ffd700;
+    outline: 2px solid #e68a00;
 }
 
 /* 🔹 КАРТОЧКИ КАМПАНИЙ */
@@ -204,7 +204,7 @@ input:focus, textarea:focus {
 }
 
 .campaign-card {
-    background: #5a0095;
+    background: #8949ba;
     padding: 15px;
     border-radius: 12px;
     box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
@@ -242,7 +242,7 @@ input:focus, textarea:focus {
 
 /* 🔹 СОЗДАНИЕ ВОЛОНТЁРСКОЙ ПРОГРАММЫ */
 .container {
-    background: #4e007b;
+    background: #724296;
     padding: 30px;
     border-radius: 12px;
     width: 50%;
@@ -253,7 +253,7 @@ input:focus, textarea:focus {
 
 /* Заголовок */
 .container h1 {
-    color: #ffd700;
+    color: white;
     font-size: 28px;
     margin-bottom: 20px;
 }
