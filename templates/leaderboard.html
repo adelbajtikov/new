@@ -142,13 +142,40 @@
     </style>
 </head>
 <body>
+<<<<<<< HEAD
     
 
     {% include 'header.html' %}
 
+=======
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <img src="/static/images/logo.png" alt="Alterra" class="logo-img">
+                <span class="logo-text">Alterra</span>
+            </div>
+            <nav class="nav">
+                <a href="{{ url_for('home') }}">Пожертвования</a>
+                <a href="{{ url_for('volunteering') }}">Волонтёрства</a>
+                <a href="{{ url_for('leaderboard') }}" class="active">Топ пользователей</a>
+            </nav>
+            <div class="user-profile">
+                {% if session.get('user_id') %}
+                    <a href="{{ url_for('profile') }}">
+                        <img src="{{ session.get('user_avatar', '/static/images/default_img.png') }}" 
+                             alt="{{ session.get('username', 'Гость') }}" class="user-avatar">
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">
+                        <img src="/static/images/user.png" alt="Гость" class="user-avatar">
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+>>>>>>> 6a43209 (Исправил ошибку с undefined 'user' в leaderboard)
     <div class="main-container">
-        <h1 class="page-title">Рейтинг пользователей</h1>
-        
         <div class="leaderboard">
             <div class="leaderboard-header">
                 <div>#</div>
@@ -156,7 +183,6 @@
                 <div>Очки</div>
                 <div>Статус</div>
             </div>
-            
             {% for user in top_users %}
             <div class="user-row">
                 <div>
@@ -171,22 +197,22 @@
                     {% endif %}
                 </div>
                 <div>
-                    <img src="{{ user.avatar if user.avatar else '/static/images/default_avatar.png' }}" 
+                    <img src="{{ user.avatar or '/static/images/default_avatar.png' }}" 
                          alt="{{ user.username }}" class="user-avatar-small">
                     <a href="{{ url_for('profile', user_id=user.id) }}" style="color: #007bff; text-decoration: none;">
                         {{ user.username }}
                     </a>
                 </div>
                 <div>
-                    {% if user.blocked is not none %}
-                        <span class="points-badge">{{ user.blocked }}</span>
+                    {% if user.points is not none %}
+                        <span class="points-badge">{{ user.points }}</span>
                     {% else %}
                         <span class="empty-points">нет данных</span>
                     {% endif %}
                 </div>
                 <div>
-                    {% if user.blocked is not none and user.blocked > 0 %}
-                        <span class="status-badge status-active">Активен ({{ user.blocked }} очков)</span>
+                    {% if user.points is not none and user.points > 0 %}
+                        <span class="status-badge status-active">Активен ({{ user.points }} очков)</span>
                     {% else %}
                         <span class="status-badge status-blocked">Неактивен</span>
                     {% endif %}

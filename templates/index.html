@@ -92,7 +92,36 @@
 </style>
 <body>
     <div class="container">
+<<<<<<< HEAD
         {% include 'header.html' %}
+=======
+        <header class="header">
+            <div class="header-container">
+                <div class="logo">
+                    <img src="/static/images/logo.png" alt="Alterra" class="logo-img">
+                    <span class="logo-text">Alterra</span>
+                </div>
+                <nav class="nav">
+                    <a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Пожертвования</a>
+                    <a href="{{ url_for('volunteering') }}" class="{% if request.endpoint == 'volunteering' %}active{% endif %}">Волонтёрства</a>
+                    <a href="{{ url_for('leaderboard') }}" class="{% if request.endpoint == 'leaderboard' %}active{% endif %}">Топ пользователей</a>
+                </nav>
+                <div class="user-profile">
+                    {% if session.get('user_id') %}
+                        <a href="{{ url_for('profile') }}">
+                            <img src="{{ user['avatar'] if user['avatar'] else '/static/images/default_img.png' }}" 
+                                 alt="{{ session['username'] }}" class="user-avatar">
+                        </a>
+                        <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}">
+                            <img src="/static/images/user.png" alt="Гость" class="user-avatar">
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+>>>>>>> 6a43209 (Исправил ошибку с undefined 'user' в leaderboard)
 
         <main>
             <!-- 🔹 Карусель кампаний -->

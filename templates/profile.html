@@ -11,6 +11,31 @@
 
     {% include 'header.html' %}
 
+<<<<<<< HEAD
+=======
+            <!-- Навигация -->
+            <nav class="nav">
+                <a href="{{ url_for('home') }}">Пожертвования</a>
+                <a href="{{ url_for('volunteering') }}">Волонтёрства</a>
+                <a href="{{ url_for('leaderboard') }}">Топ пользователей</a>
+            </nav>
+
+            <!-- Аватар и выход -->
+            <div class="user-profile">
+                {% if session.get('user_id') %}
+                    <a href="{{ url_for('profile') }}">
+                        <img src="{{ user['avatar'] if user['avatar'] else '/static/images/default_img.png' }}" class="user-avatar">
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">
+                        <img src="/static/images/user.png" alt="Гость" class="user-avatar">
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+>>>>>>> 6a43209 (Исправил ошибку с undefined 'user' в leaderboard)
     <div class="profile-container">
         <!-- Убираем h1, если он не нужен визуально (или переименуйте / спрячьте) -->
         <!-- <h1>Профиль пользователя</h1> -->
@@ -40,35 +65,15 @@
                 </p>
     
                 <!-- Блок статов: 19 / 2021$ / 37❤️ -->
-                <div class="stats-row">
-                    <div class="stat-box">
-                        <span class="stat-value">19</span>
-                        <span class="stat-label">Участий</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-value">2021$</span>
-                        <span class="stat-label">Донаты</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-value">37❤️</span>
-                        <span class="stat-label">Alivta</span>
-                    </div>
-                </div>
+
             </div>
     
-            <!-- Подписчики/Подписки -->
-            <div class="follow-info">
-                <p>Подписчики (86)</p>
-                <p>Подписки (41)</p>
-            </div>
         </div>
     
         <!-- Ниже можно оставить ваш текст с баллами, кнопками и т.д. -->
         <p><strong>Ваши баллы:</strong> {{ user.points if user.points else 0 }} 🏆</p>
-        <a href="{{ url_for('create_campaign') }}" class="btn">Создать кампанию</a>
-    
+
         <!-- Остальные элементы (кампании, заголовки и т.д.) тоже можно оставить здесь -->
-        <h2>Ваши кампании</h2>
         {% if campaigns %}
             <div class="campaign-container">
                 ...

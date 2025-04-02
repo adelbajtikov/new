@@ -170,20 +170,17 @@
 
     <main class="container">
         {% for organization in organizations %}
-        <div class="organization-card">
-            <img src="{{ organization['image_url'] }}" alt="{{ organization['name'] }}">
-            <div class="card-content">
-                <div>
-                    <h2>{{ organization['name'] }}</h2>
-                    <p>{{ organization['description'] }}</p>
+        <a href="{{ url_for('organization_posts', org_id=organization['id']) }}" class="organization-card-link">
+            <div class="organization-card">
+                <img src="{{ organization['image_url'] }}" alt="{{ organization['name'] }}">
+                <div class="card-content">
+                    <div>
+                        <h2>{{ organization['name'] }}</h2>
+                        <p>{{ organization['description'] }}</p>
+                    </div>             
                 </div>
-                <div class="btndiv">
-                    <button class="btn" onclick="followOrganization({{ organization['id'] }})">
-                        Подписаться
-                    </button>     
-                </div>               
             </div>
-        </div>
+        </a>
         {% endfor %}
     </main>
 

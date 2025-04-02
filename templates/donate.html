@@ -8,8 +8,38 @@
 </head>
 <body>
     <div class="container">
+<<<<<<< HEAD
         
         {% include 'header.html' %}
+=======
+        <header class="header">
+            <div class="header-container">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Alterra" class="logo-img">
+                    <span class="logo-text">Alterra</span>
+                </div>
+
+                <nav class="nav">
+                    <a href="{{ url_for('home') }}">Пожертвования</a>
+                    <a href="{{ url_for('volunteering') }}">Волонтёрства</a>
+                    <a href="{{ url_for('leaderboard') }}">Топ пользователей</a>
+                </nav>
+
+                <div class="user-profile">
+                    {% if user %}
+                        <a href="{{ url_for('profile') }}">
+                            <img src="{{ url_for('static', filename=user['avatar']) if user['avatar'] else url_for('static', filename='images/default_avatar.png') }}" class="user-avatar">
+                        </a>
+                        <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}">
+                            <img src="{{ url_for('static', filename='images/user.png') }}" alt="Гость" class="user-avatar">
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+>>>>>>> 6a43209 (Исправил ошибку с undefined 'user' в leaderboard)
 
         <main class="donate-page">
             <div class="donate-container">

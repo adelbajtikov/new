@@ -52,7 +52,43 @@
     </style>
 </head>
 <body>
+<<<<<<< HEAD
     {% include 'header.html' %}
+=======
+        <!-- Header -->
+        <header class="header">
+            <div class="header-container">
+                <!-- Логотип -->
+                <div class="logo">
+                    <img src="/static/images/logo.png" alt="Alterra" class="logo-img">
+                    <span class="logo-text">Alterra</span>
+                </div>
+    
+                <!-- Навигация -->
+                <nav class="nav">
+                    <a href="{{url_for('home')}}">Пожертвования</a>
+                    <a href="{{ url_for('volunteering') }}">Волонтёрства</a>
+                    <a href="{{ url_for('leaderboard') }}">Топ пользователей</a>
+                </nav>
+    
+                <!-- Аватар пользователя -->
+                <div class="user-profile">
+                    {% if session.get('user_id') %}
+                        <a href="{{ url_for('profile') }}">
+                            <img src="{{ user['avatar'] if user['avatar'] else '/static/images/default_avatar.png' }}" 
+                                 alt="{{ session['username'] }}" class="user-avatar">
+                        </a>
+                        <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}">
+                            <img src="/static/images/user.png" alt="Гость" class="user-avatar">
+                        </a>
+                    {% endif %}
+                </div>
+                
+            </div>
+        </header>
+>>>>>>> 6a43209 (Исправил ошибку с undefined 'user' в leaderboard)
         
     <div class="form-container">
         <h1>Вход</h1>
@@ -69,13 +105,9 @@
         {% endwith %}
 
         <form method="POST">
-            <label>Выберите тип аккаунта:</label>
             <div class="account-type-container">
                 <input type="radio" id="user" name="account_type" value="user" checked>
                 <label class="account-type" for="user">👤 Пользователь</label>
-
-                <input type="radio" id="organization" name="account_type" value="organization">
-                <label class="account-type" for="organization">🏢 Организация</label>
 
 
             </div>

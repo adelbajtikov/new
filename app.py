@@ -34,10 +34,11 @@ def get_db_connection():
 
 @app.route('/leaderboard')
 def leaderboard():
+    # Получаем топ пользователей, сортируя по полю points (очки)
     top_users = get_db_connection().execute("""
-        SELECT id, username, avatar, blocked 
+        SELECT id, username, avatar, points 
         FROM users 
-        ORDER BY blocked DESC NULLS LAST 
+        ORDER BY points DESC NULLS LAST 
         LIMIT 50
     """).fetchall()
 
@@ -177,7 +178,83 @@ def unblock_user(user_id):
     
     return jsonify({'success': True, 'message': 'Пользователь разблокирован'})
      
+@app.route('/organization/<int:org_id>/posts')
+def organization_posts(org_id):
+    conn = get_db_connection()
+    
+    # Получаем данные организации
+    organization = conn.execute(
+        "SELECT * FROM organizations WHERE id = ?", 
+        (org_id,)
+    ).fetchone()
+    
+    if not organization:
+        flash('Организация не найдена', 'danger')
+        return redirect(url_for('organizations'))
+    
+    # Получаем публикации организации
+    posts = conn.execute(
+        "SELECT * FROM organization_posts WHERE org_id = ? ORDER BY created_at DESC",
+        (org_id,)
+    ).fetchall()
+    
+    # Проверяем, подписан ли текущий пользователь
+    is_following = False
+    if session.get('user_id'):
+        follow = conn.execute(
+            "SELECT * FROM followers WHERE user_id = ? AND organization_id = ?",
+            (session['user_id'], org_id)
+        ).fetchone()
+        is_following = bool(follow)
+    
+    conn.close()
+    
+    return render_template(
+        'organization_posts.html',
+        organization=organization,
+        posts=posts,
+        is_following=is_following,
+        user=user if 'user_id' in session else None
+    )
 
+@app.route('/organization/create_post', methods=['GET', 'POST'])
+def create_organization_post():
+    if 'org_id' not in session:
+        flash('Только организации могут создавать посты', 'danger')
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        org_id = session['org_id']
+        
+        # Обработка загрузки изображения
+        if 'image' not in request.files:
+            flash('Файл не выбран', 'danger')
+            return redirect(request.url)
+        
+        file = request.files['image']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+            image_url = filepath
+        else:
+            flash('Недопустимый формат файла', 'danger')
+            return redirect(request.url)
+        
+        conn = get_db_connection()
+        conn.execute(
+            "INSERT INTO organization_posts (org_id, title, content, image_url) VALUES (?, ?, ?, ?)",
+            (org_id, title, content, image_url)
+        )
+        conn.commit()
+        conn.close()
+        
+        flash('Пост успешно создан!', 'success')
+        return redirect(url_for('organization_posts', org_id=org_id))
+    
+    return render_template('create_organization_post.html')
 # Функция поиска похожих кампаний
 def delete_old_entries():
     conn = sqlite3.connect("database/donations.db")
@@ -509,7 +586,6 @@ def thank_you():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        account_type = request.form['account_type']
         username = request.form['username']
         password = request.form['password']
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
@@ -517,10 +593,8 @@ def register():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        if account_type == 'user':
-            cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hashed_password))
-        elif account_type == 'organization':
-            cursor.execute("INSERT INTO organizations (name, password) VALUES (?, ?)", (username, hashed_password))
+        # Простая вставка в таблицу users (без разделения на типы аккаунтов)
+        cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hashed_password))
 
         conn.commit()
         conn.close()
@@ -531,27 +605,6 @@ def register():
     return render_template('register.html')
 
 
-@app.route('/organization/<int:org_id>')
-def organization_dashboard(org_id):
-    conn = get_db_connection()
-
-    # Получаем данные организации
-    organization = conn.execute("SELECT * FROM organizations WHERE id = ?", (org_id,)).fetchone()
-
-    if not organization:
-        flash('Организация не найдена', 'danger')
-        return redirect(url_for('organizations'))
-
-    # Получаем список подписчиков этой организации
-    followers = conn.execute("""
-        SELECT users.username FROM followers 
-        JOIN users ON followers.user_id = users.id 
-        WHERE followers.organization_id = ?
-    """, (org_id,)).fetchall()
-
-    conn.close()
-
-    return render_template('organization_dashboard.html', organization=organization, followers=followers)
 
 
 @app.route('/profile')
@@ -666,6 +719,7 @@ def update_avatar():
             flash('Недопустимый формат файла. Разрешены: PNG, JPG, JPEG, GIF.', 'danger')
 
     return render_template('update_avatar.html')
+# Вход
 # Вход
 @app.route('/login', methods=['GET', 'POST'])
 def login():
