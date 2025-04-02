@@ -249,6 +249,16 @@
                 margin: 2px 0;
             }
         }
+        .danger-zone {
+            margin-top: 50px;
+            padding: 20px;
+            border: 2px solid #dc3545;
+            border-radius: 5px;
+        }
+        .danger-zone h3 {
+            color: #dc3545;
+        }
+        
     </style>
 </head>
 <body>
@@ -337,6 +347,60 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                    <div class="danger-zone">
+                        <h3>Опасная зона</h3>
+                        <form method="POST" action="{{ url_for('clear_all_data') }}" 
+                              onsubmit="return confirm('Это удалит ВСЕ данные безвозвратно. Вы уверены?')">
+                            <input type="hidden" name="confirmation" value="delete_all">
+                            
+                            <div class="form-group">
+                                <label>Для подтверждения введите "DELETE ALL":</label>
+                                <input type="text" name="confirmation_text" 
+                                       pattern="DELETE ALL" required
+                                       placeholder="Точная фраза для подтверждения">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Удалить волонтерскии акции данные
+                            </button>
+                        </form>
+                    </div>
+                    <div class="danger-zone">
+                        <h3>Опасная зона</h3>
+                        <form method="POST" action="{{ url_for('clear_campaigns') }}" 
+                              onsubmit="return confirm('Это удалит ВСЕ данные безвозвратно. Вы уверены?')">
+                            <input type="hidden" name="confirmation" value="delete_all">
+                            
+                            <div class="form-group">
+                                <label>Для подтверждения введите "DELETE ALL":</label>
+                                <input type="text" name="confirmation_text" 
+                                       pattern="DELETE ALL" required
+                                       placeholder="Точная фраза для подтверждения">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Удалить campaign акции данные
+                            </button>
+                        </form>
+                    </div>
+                    <div class="danger-zone">
+                        <h3>Опасная зона</h3>
+                        <form method="POST" action="{{ url_for('clear_users') }}" 
+                              onsubmit="return confirm('Это удалит ВСЕ данные безвозвратно. Вы уверены?')">
+                            <input type="hidden" name="confirmation" value="delete_all">
+                            
+                            <div class="form-group">
+                                <label>Для подтверждения введите "DELETE ALL":</label>
+                                <input type="text" name="confirmation_text" 
+                                       pattern="DELETE ALL" required
+                                       placeholder="Точная фраза для подтверждения">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Удалить users акции данные
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -409,6 +473,10 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                    <a href="{{ url_for('clear_donations') }}" 
+                        onclick="return confirm('Вы точно хотите удалить ВСЕ пожертвования?')" class="btn btn-danger">
+                        🗑️ Очистить пожертвования
+                    </a>
                 </div>
             </div>
         </div>

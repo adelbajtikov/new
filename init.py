@@ -6,17 +6,22 @@ DATABASE = 'database/donations.db'
 def get_db_connection():
     return sqlite3.connect(DATABASE)
 conn = get_db_connection()
-cursor = conn.cursor()
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS organization_posts (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        org_id INTEGER NOT NULL,
-        title TEXT NOT NULL,
-        content TEXT NOT NULL,
-        image_url TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (org_id) REFERENCES organizations(id)
-    )
-''')
-conn.commit()
-conn.close()
+def update_db_structure():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Проверяем, есть ли столбцы is_completed и completed_at в таблице campaigns
+    cursor.execute("PRAGMA table_info(campaigns)")
+    columns = [column[1] for column in cursor.fetchall()]
+    
+    if 'is_completed' not in columns:
+        cursor.execute("ALTER TABLE campaigns ADD COLUMN is_completed BOOLEAN DEFAULT 0")
+    
+    if 'completed_at' not in columns:
+        cursor.execute("ALTER TABLE campaigns ADD COLUMN completed_at DATETIME")
+    
+    conn.commit()
+    conn.close()
+
+# Вызываем при запуске приложения
+update_db_structure()

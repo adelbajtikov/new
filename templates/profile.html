@@ -46,24 +46,18 @@
             </div>
     
             <!-- Информация о пользователе -->
+            <!-- Информация о пользователе -->
             <div class="profile-info">
                 <!-- Имя -->
                 <p class="username"><strong>{{ user.username }}</strong></p>
-    
-                <!-- Описание (пример текста из скриншота) -->
-                <p class="user-description">
-                    Люблю помогать людям и природе, участвую в благотворительных и экологических проектах.
-                    Готов(а) делиться временем и энергией ради добрых дел! 💖
-                </p>
-    
-                <!-- Блок статов: 19 / 2021$ / 37❤️ -->
 
+                <!-- Описание с возможностью редактирования -->
+                <p><strong>Ваши баллы:</strong> {{ user.points if user.points else 0 }} 🏆</p>
             </div>
     
         </div>
     
         <!-- Ниже можно оставить ваш текст с баллами, кнопками и т.д. -->
-        <p><strong>Ваши баллы:</strong> {{ user.points if user.points else 0 }} 🏆</p>
 
         <!-- Остальные элементы (кампании, заголовки и т.д.) тоже можно оставить здесь -->
         {% if campaigns %}
@@ -77,7 +71,6 @@
 
     <!-- Блок с кнопками и баллами -->
     <div class="profile-actions">
-        <p><strong>Ваши баллы:</strong> {{ user.points if user.points else 0 }} 🏆</p>
         <a href="{{ url_for('create_campaign') }}" class="btn">Создать кампанию</a>
         <button class="btn" onclick="openPaymentsModal()">История платежей</button>
         <a href="{{ url_for('create_volunteering') }}" class="btn create-btn">Создать волонтёрскую акцию</a>
@@ -321,9 +314,85 @@
     function closeParticipantsModal() {
         document.getElementById("participantsModal").style.display = "none";
     }
+    function editDescription() {
+    document.getElementById('descriptionText').style.display = 'none';
+    document.getElementById('editDescriptionBtn').style.display = 'none';
+    document.getElementById('descriptionForm').style.display = 'block';
+    }
 
+    function cancelEditDescription() {
+        document.getElementById('descriptionText').style.display = 'block';
+        document.getElementById('editDescriptionBtn').style.display = 'block';
+        document.getElementById('descriptionForm').style.display = 'none';
+    }
+
+    // Обработка отправки формы
+    document.getElementById('descriptionForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const newDescription = document.getElementById('descriptionInput').value;
+        
+        fetch('/update_description', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ description: newDescription })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('descriptionText').textContent = 
+                    newDescription || 'Пока нет описания. Добавьте что-нибудь о себе!';
+                cancelEditDescription();
+                // Обновляем кнопку
+                document.getElementById('editDescriptionBtn').textContent = 
+                    newDescription ? 'Изменить описание' : 'Добавить описание';
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
 
     </script>
+    <script>
+// Редактирование описания
+function editDescription() {
+    document.getElementById('descriptionText').style.display = 'none';
+    document.getElementById('editDescriptionBtn').style.display = 'none';
+    document.getElementById('descriptionForm').style.display = 'block';
+}
+
+function cancelEditDescription() {
+    document.getElementById('descriptionText').style.display = 'block';
+    document.getElementById('editDescriptionBtn').style.display = 'block';
+    document.getElementById('descriptionForm').style.display = 'none';
+}
+
+// Обработка формы
+form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+    const newDescription = document.getElementById('descriptionInput').value;
+    
+    try {
+        const response = await fetch('/update_description', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken  // Добавляем CSRF-токен в заголовки
+            },
+            body: JSON.stringify({ 
+                description: newDescription,
+                csrf_token: csrfToken  // Или можно отправить в теле
+            })
+        });
+        
+        // Остальной код обработки ответа...
+    } catch (error) {
+        console.error('Ошибка:', error);
+    }
+});
+</script>
     </div>
 
 </body>

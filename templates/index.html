@@ -92,9 +92,9 @@
 </style>
 <body>
     <div class="container">
-<<<<<<< HEAD
+
         {% include 'header.html' %}
-=======
+
         <header class="header">
             <div class="header-container">
                 <div class="logo">
@@ -121,7 +121,7 @@
                 </div>
             </div>
         </header>
->>>>>>> 6a43209 (Исправил ошибку с undefined 'user' в leaderboard)
+
 
         <main>
             <!-- 🔹 Карусель кампаний -->
@@ -138,11 +138,17 @@
                                     <div style="width: {{ (campaign['collected'] / campaign['goal']) * 100 }}%;"></div>
                                 </div>
                                 <p><strong>Собрано:</strong> ${{ campaign['collected'] }} из ${{ campaign['goal'] }}</p>
+                                {% if campaign['collected'] < campaign['goal'] %}
                                 <a href="{{ url_for('donate', campaign_id=campaign['id']) }}" style="color: #fff; text-decoration: none;">
-                                <button class="btn">
+                                    <button class="btn">
                                         Пожертвовать
-                                </button>
+                                    </button>
                                 </a>
+                            {% else %}
+                                <button class="btn btn-disabled" disabled>
+                                    Сбор закрыт
+                                </button>
+                            {% endif %}
                             </div>
                         </section>
 
@@ -209,33 +215,52 @@
             {% if campaigns and campaigns|length > 0 %}
                 {% for campaign in campaigns %}
                 <div class="campaign-card">
+                    {% if campaign['collected'] >= campaign['goal'] %}
+                        <div class="campaign-completed-banner">
+                            Сбор завершен!
+                        </div>
+                    {% endif %}
+                    
                     <img src="{{ campaign['image_url'] }}" alt="{{ campaign['title'] }}">
                     <div class="campaign-content">
                         <h2>{{ campaign['title'] }}</h2>
                         <p>{{ campaign['description'] }}</p>
                         <div class="progress-bar">
-                            <div style="width: {{ (campaign['collected'] / campaign['goal']) * 100 }}%;"></div>
+                            <div style="width: {{ (campaign['collected'] / campaign['goal']) * 100 if campaign['goal'] > 0 else 0 }}%;"></div>
                         </div>
                         <div class="campaign-stats">
                             <span>${{ campaign['collected'] }}</span>
                             <span>${{ campaign['goal'] }}</span>
                         </div>
-                        <a href="{{ url_for('donate', campaign_id=campaign['id']) }}" style="color: #fff; text-decoration: none;">
-                        <button class="btn">
-                                Пожертвовать
-                        </button>
-                        </a>
+                        
+                        {% if campaign['collected'] < campaign['goal'] %}
+                            <a href="{{ url_for('donate', campaign_id=campaign['id']) }}" style="color: #fff; text-decoration: none;">
+                                <button class="btn">
+                                    Пожертвовать
+                                </button>
+                            </a>
+                        {% else %}
+                            <button class="btn btn-disabled" disabled>
+                                Сбор закрыт
+                            </button>
+                        {% endif %}
                     </div>
                 </div>
                 {% endfor %}
             {% else %}
                 <div class="no-campaigns">
-                    <h2>Пока что нет публикаций</h2>
-                    <p>Создайте первую кампанию, чтобы помочь нуждающимся!</p>
-                    <a href="{{ url_for('create_campaign') }}" class="btn">Создать кампанию</a>
+                    <h2>Пока что нет активных кампаний</h2>
+                    {% if session.get('user_id') %}
+                        <p>Вы можете создать первую кампанию!</p>
+                        <a href="{{ url_for('create_campaign') }}" class="btn">Создать кампанию</a>
+                    {% else %}
+                        <p>Войдите, чтобы создать кампанию</p>
+                        <a href="{{ url_for('login') }}" class="btn">Войти</a>
+                    {% endif %}
                 </div>
             {% endif %}
-        </div>   
+        </div>
+ 
         <hr style="border: 1px solid rgba(255, 255, 255, 0.3); margin: 40px 0;">
 
         <div class="ads-container">

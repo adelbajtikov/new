@@ -11,7 +11,13 @@ from datetime import datetime
 import nltk
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
-
+from threading import Thread
+import time
+from datetime import datetime, timedelta
+from flask_wtf.csrf import CSRFProtect
+import secrets
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import fitz  # PyMuPDF - работа с PDF
 app = Flask(__name__)
 UPLOAD_FOLDER = 'static/uploads'
@@ -25,12 +31,56 @@ DATABASE = 'database/donations.db'
 app.secret_key = 'root_123'
 ADMIN_USERNAME = 'root_123'
 ADMIN_PASSWORD = '4444'
-
+limiter = Limiter(app=app, key_func=get_remote_address)
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
+from datetime import datetime, timedelta
 
+def check_and_close_completed_campaigns():
+    conn = get_db_connection()
+    today = datetime.now()
+    
+    try:
+        # Проверяем, существует ли столбец is_completed (на случай, если ALTER TABLE не сработал)
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA table_info(campaigns)")
+        columns = [column[1] for column in cursor.fetchall()]
+        has_is_completed = 'is_completed' in columns
+        has_completed_at = 'completed_at' in columns
+        
+        # Закрываем завершенные кампании
+        if has_is_completed and has_completed_at:
+            # Кампании, где собрана нужная сумма, но еще не закрыты
+            campaigns_to_close = conn.execute('''
+                SELECT id FROM campaigns 
+                WHERE collected >= goal 
+                AND is_completed = 0
+            ''').fetchall()
+            
+            for campaign in campaigns_to_close:
+                conn.execute('''
+                    UPDATE campaigns 
+                    SET is_completed = 1, 
+                        completed_at = ?
+                    WHERE id = ?
+                ''', (today, campaign['id']))
+        
+        # Удаляем старые кампании (7+ дней после завершения)
+        if has_completed_at:
+            week_ago = today - timedelta(days=7)
+            conn.execute('''
+                DELETE FROM campaigns 
+                WHERE is_completed = 1 
+                AND completed_at < ?
+            ''', (week_ago,))
+        
+        conn.commit()
+    except Exception as e:
+        print(f"Ошибка при обработке кампаний: {e}")
+    finally:
+        conn.close()
 
 @app.route('/leaderboard')
 def leaderboard():
@@ -52,7 +102,25 @@ def leaderboard():
         ).fetchone()
 
     return render_template('leaderboard.html', top_users=top_users, user=user)
-
+@app.route('/update_description', methods=['POST'])
+def update_description():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Необходима авторизация'}), 401
+    
+    description = request.json.get('description', '')
+    
+    conn = get_db_connection()
+    try:
+        conn.execute(
+            "UPDATE users SET description = ? WHERE id = ?",
+            (description, session['user_id'])
+        )
+        conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        conn.close()
 @app.route('/admin')
 def admin_dashboard():
     if 'admin' not in session:
@@ -71,6 +139,7 @@ def admin_dashboard():
                 d.amount, 
                 d.created_at, 
                 d.user_id,
+                d.status,
                 c.title as campaign_title,
                 d.receipt_path
             FROM donations d
@@ -92,28 +161,82 @@ def admin_dashboard():
 
 @app.route('/admin/confirm_donation/<int:donation_id>', methods=['POST'])
 def confirm_donation(donation_id):
+    # Check admin authentication
     if 'admin' not in session:
-        return jsonify({'error': 'Доступ запрещен'}), 403
+        return jsonify({'success': False, 'error': 'Доступ запрещен'}), 403
     
-    conn = get_db_connection()
-    
-    # Получаем сумму пожертвования
-    donation = conn.execute('SELECT amount, campaign_id FROM donations WHERE id = ?', (donation_id,)).fetchone()
-    
-    # Обновляем статус
-    conn.execute("UPDATE donations SET status = 'confirmed' WHERE id = ?", (donation_id,))
-    
-    # Обновляем собранную сумму в кампании
-    conn.execute('''
-        UPDATE campaigns 
-        SET collected = collected + ? 
-        WHERE id = ?
-    ''', (donation['amount'], donation['campaign_id']))
-    
-    conn.commit()
-    conn.close()
-    
-    return jsonify({'success': True, 'message': 'Пожертвование подтверждено'})
+    conn = None
+    try:
+        conn = get_db_connection()
+        # Start transaction - SQLite will automatically lock in EXCLUSIVE mode
+        conn.execute('BEGIN')
+        
+        # Get donation data - no FOR UPDATE needed in SQLite
+        donation = conn.execute(
+            'SELECT amount, campaign_id, status FROM donations WHERE id = ?',
+            (donation_id,)
+        ).fetchone()
+        
+        if not donation:
+            conn.rollback()
+            return jsonify({
+                'success': False,
+                'error': 'Пожертвование не найдено'
+            }), 404
+        
+        if donation['status'] != 'pending':
+            conn.rollback()
+            return jsonify({
+                'success': False,
+                'error': f'Пожертвование уже имеет статус: {donation["status"]}'
+            }), 400
+        
+        # Update donation status (basic version without processed_at)
+        conn.execute(
+            "UPDATE donations SET status = 'confirmed' WHERE id = ?",
+            (donation_id,)
+        )
+        
+        # Update campaign collected amount
+        conn.execute(
+            'UPDATE campaigns SET collected = collected + ? WHERE id = ?',
+            (donation['amount'], donation['campaign_id'])
+        )
+        
+        conn.commit()
+        app.logger.info(f'Пожертвование {donation_id} подтверждено. Сумма: {donation["amount"]}')
+        
+        return jsonify({
+            'success': True,
+            'message': 'Пожертвование успешно подтверждено',
+            'donation_id': donation_id,
+            'amount': donation['amount'],
+            'campaign_id': donation['campaign_id']
+        })
+        
+    except sqlite3.Error as e:
+        if conn:
+            conn.rollback()
+        app.logger.error(f'Ошибка при подтверждении пожертвования {donation_id}: {str(e)}')
+        return jsonify({
+            'success': False,
+            'error': 'Ошибка базы данных',
+            'details': str(e)
+        }), 500
+        
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        app.logger.error(f'Неожиданная ошибка: {str(e)}')
+        return jsonify({
+            'success': False,
+            'error': 'Внутренняя ошибка сервера',
+            'details': str(e)
+        }), 500
+        
+    finally:
+        if conn:
+            conn.close()
 
 @app.route('/admin/reject_donation/<int:donation_id>', methods=['POST'])
 def reject_donation(donation_id):
@@ -588,25 +711,157 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
-
+        
         conn = get_db_connection()
         cursor = conn.cursor()
+        
+        try:
+            # Проверяем, существует ли уже пользователь с таким именем
+            existing_user = cursor.execute(
+                "SELECT id FROM users WHERE username = ?", 
+                (username,)
+            ).fetchone()
 
-        # Простая вставка в таблицу users (без разделения на типы аккаунтов)
-        cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hashed_password))
+            if existing_user:
+                flash('Пользователь с таким именем уже существует', 'danger')
+                return redirect(url_for('register'))
 
-        conn.commit()
-        conn.close()
-
-        flash('Регистрация успешна!', 'success')
-        return redirect(url_for('login'))
+            # Если пользователя нет - регистрируем
+            hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+            
+            cursor.execute(
+                "INSERT INTO users (username, password) VALUES (?, ?)", 
+                (username, hashed_password)
+            )
+            
+            conn.commit()
+            flash('Регистрация успешна! Теперь вы можете войти.', 'success')
+            return redirect(url_for('login'))
+            
+        except sqlite3.Error as e:
+            conn.rollback()
+            flash(f'Ошибка базы данных: {str(e)}', 'danger')
+            return redirect(url_for('register'))
+            
+        finally:
+            conn.close()
 
     return render_template('register.html')
 
 
+@app.route('/clear_donations')
+def clear_donations():
+    if 'admin' not in session:
+        flash('Только для администраторов!', 'danger')
+        return redirect(url_for('login'))
+    
+    conn = get_db_connection()
+    try:
+        conn.execute("DELETE FROM donations")
+        conn.commit()
+        flash('Все пожертвования очищены!', 'success')
+    except Exception as e:
+        flash(f'Ошибка: {e}', 'danger')
+    finally:
+        conn.close()
+    
+    return redirect(url_for('admin_dashboard'))  # Перенаправляем обратно в админку
+@app.route('/clear_all_data', methods=['POST'])
+def clear_all_data():
+    # Проверка прав администратора
+    if 'admin' not in session:
+        flash('Доступ только для администратора', 'danger')
+        return redirect(url_for('login'))
 
+    # Проверка подтверждения
+    if request.form.get('confirmation') != 'delete_all':
+        flash('Неверный код подтверждения', 'danger')
+        return redirect(url_for('admin_panel'))
 
+    conn = None
+    try:
+        conn = get_db_connection()
+        
+        # Удаляем все волонтерские акции
+        conn.execute("DELETE FROM volunteering_opportunities")
+        
+        conn.commit()
+        flash('Все данные успешно удалены: и пожертвования, и волонтерские акции', 'success')
+    
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        flash(f'Ошибка при удалении: {str(e)}', 'danger')
+    
+    finally:
+        if conn:
+            conn.close()
+    
+    return redirect(url_for('admin_dashboard'))
+@app.route('/clear_campaigns', methods=['POST'])
+def clear_campaigns():
+    # Проверка прав администратора
+    if 'admin' not in session:
+        flash('Доступ только для администратора', 'danger')
+        return redirect(url_for('login'))
+
+    # Проверка подтверждения
+    if request.form.get('confirmation') != 'delete_all':
+        flash('Неверный код подтверждения', 'danger')
+        return redirect(url_for('admin_panel'))
+
+    conn = None
+    try:
+        conn = get_db_connection()
+        
+        # Удаляем все волонтерские акции
+        conn.execute("DELETE FROM campaigns")
+        
+        conn.commit()
+        flash('Все данные успешно удалены: и пожертвования, и волонтерские акции', 'success')
+    
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        flash(f'Ошибка при удалении: {str(e)}', 'danger')
+    
+    finally:
+        if conn:
+            conn.close()
+    
+    return redirect(url_for('admin_dashboard'))
+@app.route('/clear_campaigns', methods=['POST'])
+def clear_users():
+    # Проверка прав администратора
+    if 'admin' not in session:
+        flash('Доступ только для администратора', 'danger')
+        return redirect(url_for('login'))
+
+    # Проверка подтверждения
+    if request.form.get('confirmation') != 'delete_all':
+        flash('Неверный код подтверждения', 'danger')
+        return redirect(url_for('admin_dashboard'))
+
+    conn = None
+    try:
+        conn = get_db_connection()
+        
+        # Удаляем все волонтерские акции
+        conn.execute("DELETE FROM users")
+        
+        conn.commit()
+        flash('Все данные успешно удалены: и пожертвования, и волонтерские акции', 'success')
+    
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        flash(f'Ошибка при удалении: {str(e)}', 'danger')
+    
+    finally:
+        if conn:
+            conn.close()
+    
+    return redirect(url_for('admin_dashboard'))
 @app.route('/profile')
 def profile():
     if not session.get('user_id'):
@@ -618,7 +873,8 @@ def profile():
 
     # ✅ Получаем данные пользователя
     user = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
-
+    if 'csrf_token' not in session:
+        session['csrf_token'] = secrets.token_hex(16)
     # ✅ Кампании, созданные пользователем
     campaigns = conn.execute(
         "SELECT * FROM campaigns WHERE user_id = ?", (user_id,)
@@ -684,7 +940,8 @@ def profile():
         volunteer_initiatives=volunteer_initiatives,
         participated_campaigns=participated_campaigns,  # ✅ Добавили кампании, где user участвует
         participated_opportunities=participated_opportunities,  # ✅ Добавили акции, где user участвует
-        donations = donations
+        donations = donations,
+        csrf_token=session['csrf_token']
     )
 @app.route('/update_avatar', methods=['GET', 'POST'])
 def update_avatar():
@@ -1078,6 +1335,16 @@ def unblock_organization(org_id):
     conn.close()
     
     return jsonify({'success': True, 'message': 'Организация разблокирована'})
+# Вызывать при каждом запуске сервера
+check_and_close_completed_campaigns()
 
+def campaign_checker():
+    while True:
+        check_and_close_completed_campaigns()
+        # Проверяем раз в день (86400 секунд)
+        time.sleep(86400)
 if __name__ == '__main__':
+    checker_thread = Thread(target=campaign_checker)
+    checker_thread.daemon = True
+    checker_thread.start()
     app.run(debug=True)
