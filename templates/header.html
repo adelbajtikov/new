@@ -1,197 +1,189 @@
 <header class="header">
     <div class="header-container">
-        <div class="logo">
-            <img src="/static/images/logo.png" alt="Alterra" class="logo-img">
-            <span class="logo-text">Alterra</span>
-        </div>
-        <nav class="nav">
-            <a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Пожертвования</a>
-            <a href="{{ url_for('volunteering') }}" class="{% if request.endpoint == 'volunteering' %}active{% endif %}">Волонтёрства</a>
-            <a href="{{url_for('leaderboard')}}" class="{% if request.endpoint == 'leaderboard' %}active{% endif %}">Топ пользователей</a>
-        </nav>
-        <div class="user-profile">
-            {% if session.get('user_id') %}
-                <a href="{{ url_for('profile') }}">
-                    <img src="{{ user['avatar'] if user['avatar'] else '/static/images/default_avatar.png' }}" 
-                         alt="{{ session['username'] }}" class="user-avatar">
-                </a>
-                <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
-            {% else %}
-                <a href="{{ url_for('login') }}">
-                    <img src="/static/images/user.png" alt="Гость" class="user-avatar">
-                </a>
-            {% endif %}
-        </div>
+      <div class="logo">
+        <img src="/static/images/logo.png" alt="Alterra" class="logo-img" />
+        <span class="logo-text">Alterra</span>
+      </div>
+  
+      <!-- Burger -->
+      <div class="burger-menu" onclick="toggleNav()">
+        <span class="burger-line"></span>
+        <span class="burger-line"></span>
+        <span class="burger-line"></span>
+      </div>
+  
+      <!-- Навигация -->
+      <nav class="nav" id="nav">
+        <a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Пожертвования</a>
+        <a href="{{ url_for('volunteering') }}" class="{% if request.endpoint == 'volunteering' %}active{% endif %}">Волонтёрства</a>
+        <a href="{{ url_for('leaderboard') }}" class="{% if request.endpoint == 'leaderboard' %}active{% endif %}">Топ пользователей</a>
+      </nav>
+  
+      <div class="user-profile">
+        {% if session.get('user_id') %}
+          <a href="{{ url_for('profile') }}">
+            <img src="{{ user['avatar'] if user['avatar'] else '/static/images/default_avatar.png' }}" 
+                 alt="{{ session['username'] }}" class="user-avatar">
+          </a>
+          <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
+        {% else %}
+          <a href="{{ url_for('login') }}">
+            <img src="/static/images/user.png" alt="Гость" class="user-avatar">
+          </a>
+        {% endif %}
+      </div>
     </div>
-</header>
-
+  </header>
+  <script>
+    function toggleNav() {
+      const nav = document.getElementById('nav');
+      nav.classList.toggle('active');
+    }
+  
+    // Закрытие при клике вне
+    document.addEventListener('click', function (e) {
+      const nav = document.getElementById('nav');
+      const burger = document.querySelector('.burger-menu');
+      if (!nav.contains(e.target) && !burger.contains(e.target)) {
+        nav.classList.remove('active');
+      }
+    });
+  </script>
 <style>
-        /* Header */
+    /* Header */
 .header {
-    background-color: #fff;
-    border-bottom: 2px solid #e0e0e0;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    height: 80px;
-    box-sizing: border-box;
+  background: white;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 80px;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* Контейнер для хедера */
 .header-container {
-    width: 100%;
-    max-width: 1200px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  max-width: 2000px;
+  margin: 0; /* Убираем отступы */
+  padding: 0 20px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
 }
 
-/* Логотип */
+
+/* Logo */
 .logo {
-    display: flex;
-    align-items: center;
-    font-size: 24px;
-    font-weight: bold;
-    color: #6a1b9a;
+  display: flex;
+  align-items: center;
 }
-
 .logo-img {
-    width: 45px;
-    height: 40px;
-    margin-right: 10px;
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
 }
-
 .logo-text {
-    font-size: 33px;
-    line-height: 45px;
-    font-weight: 700;
-    color: #714C8D;
-    font-family: 'Iowan Old Style', serif;
+  font-size: 28px;
+  font-weight: bold;
+  color: #714C8D;
 }
 
-/* Навигация */
+/* Navigation */
 .nav {
-    display: flex;
-    gap: 50px;
-    margin-left: 400px;
-    margin-right: 30px;
+  display: flex;
+  gap: 40px;
 }
-
 .nav a {
-    text-decoration: none;
-    color: #000;
-    padding: 5px 10px;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    border-radius: 15px;
+  text-decoration: none;
+  color: #000;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 8px;
 }
-
-.nav a:hover {
-    background-color: #f0f0f0;
-}
-
 .nav a.active {
-    border: 1px solid purple;
-    font-weight: bold;
+  border: 1px solid #714C8D;
+}
+.nav a:hover {
+  background: #f2f2f2;
 }
 
-/* Профиль пользователя */
+/* Burger */
+.burger-menu {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 25px;
+  height: 20px;
+  cursor: pointer;
+}
+.burger-line {
+  height: 3px;
+  width: 100%;
+  background: #000;
+  border-radius: 2px;
+}
+
+
+/* User Profile */
 .user-profile {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-
 .user-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 15px;
-    object-fit: cover;
-    border: 2px solid #6a1b9a;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #714C8D;
 }
-
 .logout-link {
-    color: red;
-    text-decoration: none;
-    margin-left: 10px;
+  color: red;
+  text-decoration: none;
 }
-@media (max-width: 480px) {
-    .logo-img {
-        height: 20px;
-    }
-    .logo-text{
-        display: none;
-    }
-    .carousel {
-        display: none;
-    }
-    
-    .user-avatar {
-        width: 30px;
-        height: 30px;
-    }
-
-    .campaign {
-        width: 100%;
-        margin: 10px auto;
-    }
-
-    .campaign h2 {
-        font-size: 14px;
-    }
-
-    .progress-bar {
-        width: 100%;
-    }
-
-    .campaign button {
-        width: 100%;
-        padding: 8px;
-    }
-
-    .header-container{
-        margin: 0 auto;
-    }
-    .donate-container {
-        max-width: 95%;
-        padding: 10px;
-    }
-
-    .footer {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .footer-info {
-        margin-top: 15px;
-    }
-
-    .dots {
-        bottom: 10px;
-    }
-
-    .dot {
-        height: 10px;
-        width: 10px;
-    }
-    .n{
-        margin-left: -300px;
-    }
-    .search-box{
-        margin-top: 60px;
-        height: 15px;
-    }
-
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
+
+
+@media (max-width: 768px) {
+
+
+  .nav {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 80px;
+    left: 0;
+    width: 100%;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .nav.active {
+    display: flex;
+  }
+
+  .burger-menu {
+    display: flex;
+  }
+
+  .logo-img {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+  }
+  .logo-text {
+    display: None;
+  }
+  .user-profile {
+    margin-right: 20px;
+  }
+}
+
 
 </style>

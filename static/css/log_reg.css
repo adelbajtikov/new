@@ -18,102 +18,6 @@ body {
     margin: 0 auto;
 }
 
-/* Header */
-/* Основной стиль для хедера */
-.header {
-    background-color: #fff;
-    border-bottom: 2px solid #e0e0e0;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Контейнер для хедера */
-.header-container {
-    width: 100%;
-    max-width: 1200px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* Логотип */
-.logo {
-    display: flex;
-    align-items: center;
-}
-
-.logo-img {
-    height: 30px;
-    margin-right: 10px;
-}
-
-.logo-text {
-    font-size: 20px;
-    font-weight: bold;
-    color: #6a1b9a;
-}
-.user-profile {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.user-profile img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-}
-
-.logout-link {
-    color: red;
-    text-decoration: none;
-    margin-left: 10px;
-}
-
-/* Навигация */
-.nav {
-    display: flex;
-    gap: 50px;
-    margin-left: 450px;
-}
-
-.nav a {
-    text-decoration: none;
-    color: #000; /* стандартный цвет ссылок */
-    padding: 5px 10px;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-}
-
-.nav a:hover {
-    background-color: #f0f0f0; /* цвет при наведении */
-}
-
-.nav a.active {
-    border: 1px solid purple;/* цвет фона для активного элемента */  
-    font-weight: bold;
-}
-/* Аватар пользователя */
-.user-profile {
-    display: flex;
-    align-items: center;
-}
-
-.user-avatar {
-    height: 40px;
-    width: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #6a1b9a;
-}
-
 .form-container {
     max-width: 400px;
     margin: 50px auto;
@@ -162,21 +66,7 @@ p {
     text-align: center;
 }
 @media (max-width: 480px) {
-    .logo-img {
-        height: 20px;
-    }
-    .logo-text{
-        display: none;
-    }
-    .carousel {
-        display: none;
-    }
     
-    .user-avatar {
-        width: 30px;
-        height: 30px;
-
-    }
 
     .campaign {
         width: 100%;
@@ -196,9 +86,6 @@ p {
         padding: 8px;
     }
 
-    .header-container{
-        margin: 0 auto;
-    }
     .donate-container {
         max-width: 95%;
         padding: 10px;
@@ -230,21 +117,8 @@ p {
     }
 }
 @media (max-width: 768px) {
-    .header {
-        flex-direction: column;
-        padding: 15px;
-        text-align: center;
-    }
 
-    .logo {
-        margin-bottom: 10px;
-    }
 
-    .nav {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
-    }
 
     .carousel {
         height: 70vh;

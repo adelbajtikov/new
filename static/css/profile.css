@@ -448,3 +448,95 @@ h2 {
     font-weight: bold;
     color: #6a1b9a;
 }
+
+@media (max-width: 768px) {
+    .profile-header-row {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .profile-avatar-container {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+
+    .profile-info {
+        text-align: center;
+    }
+
+    .stats-row {
+        justify-content: center;
+    }
+
+    .follow-info {
+        text-align: center;
+    }
+
+    .nav {
+        flex-direction: column;
+        gap: 10px;
+        margin-left: 0;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .logo-text {
+        font-size: 24px;
+    }
+
+    .campaign-container,
+    .volunteer-grid,
+    .volunteering-block {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-content {
+        margin: 30px auto;
+        padding: 15px;
+    }
+
+    .campaign h2,
+    h2 {
+        font-size: 18px;
+    }
+
+    .btn {
+        font-size: 13px;
+        padding: 6px 12px;
+    }
+}
+
+@media (max-width: 380px) {
+    .logo-img {
+        width: 30px;
+        height: 30px;
+    }
+
+    .logo-text {
+        font-size: 20px;
+    }
+
+    .profile-avatar {
+        width: 90px;
+        height: 90px;
+    }
+
+    .stat-value {
+        font-size: 16px;
+    }
+
+    .stat-label {
+        font-size: 11px;
+    }
+
+    .nav a {
+        font-size: 14px;
+        padding: 4px 8px;
+    }
+
+    .user-avatar {
+        width: 28px;
+        height: 28px;
+    }
+}

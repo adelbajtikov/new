@@ -89,16 +89,6 @@
             box-shadow: 0 0 15px rgba(252, 250, 138, 0.6);
         }
         @media (max-width: 768px) {
-        .header {
-            flex-direction: column;
-            padding: 15px;
-            text-align: center;
-        }
-
-        .logo {
-            margin-bottom: 10px;
-        }
-
         .nav {
             flex-wrap: wrap;
             justify-content: center;
@@ -168,19 +158,8 @@
         }
     }
         @media (max-width: 480px) {
-            .logo-img {
-                height: 20px;
-            }
-            .logo-text{
-                display: none;
-            }
             .carousel {
                 display: none;
-            }
-            
-            .user-avatar {
-                width: 30px;
-                height: 30px;
             }
 
             .campaign {
@@ -199,10 +178,6 @@
             .campaign button {
                 width: 100%;
                 padding: 8px;
-            }
-
-            .header-container{
-                margin: 0 auto;
             }
             .donate-container {
                 max-width: 95%;
@@ -272,38 +247,6 @@
 
     {% include 'header.html' %}
 
-    <header class="header">
-        <div class="header-container">
-            <!-- Логотип -->
-            <div class="logo">
-                <img src="/static/images/logo.png" alt="Alterra" class="logo-img">
-                <span class="logo-text">Alterra</span>
-            </div>
-
-            <!-- Навигация -->
-            <nav class="nav">
-                <div class="n">
-                    <a href="{{ url_for('home') }}">Пожертвования</a>
-                    <a href="{{ url_for('volunteering') }}">Волонтёрства</a>
-                    <a href="{{ url_for('leaderboard') }}" class="{% if request.endpoint == 'organizations' %}active{% endif %}">Топ пользователей</a>
-                </div>
-            </nav>
-
-            <!-- Аватар и выход -->
-            <div class="user-profile">
-                {% if session.get('user_id') %}
-                    <a href="{{ url_for('profile') }}">
-                        <img src="{{ user['avatar'] if user['avatar'] else '/static/images/default_img.png' }}" class="user-avatar">
-                    </a>
-                    <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
-                {% else %}
-                    <a href="{{ url_for('login') }}">
-                        <img src="/static/images/user.png" alt="Гость" class="user-avatar">
-                    </a>
-                {% endif %}
-            </div>
-        </div>
-    </header>
 
     <!-- Контейнер -->
     <div class="container">
