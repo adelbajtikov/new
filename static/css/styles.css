@@ -11,7 +11,6 @@ body {
 
 .container {
     width: 100%;
-    margin: 0 auto;
 }
 .profile-avatar {
     width: 120px;
@@ -463,9 +462,7 @@ body {
 
 @media (max-width: 768px) {
     .header {
-        flex-direction: column;
-        padding: 15px;
-        text-align: center;
+        text-align: left;
     }
 
     .logo {
@@ -473,9 +470,9 @@ body {
     }
 
     .nav {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
+        background-color: #007BFF;
+        margin-right: 700px;
+        position: fixed;
     }
 
     .carousel {
@@ -503,13 +500,33 @@ body {
         padding: 8px 12px;
         font-size: 14px;
     }
+    .n{
+        margin-left: -300px;
+    }
+    .logo-text{
+        display: none;
+    }
+    .carousel {
+        display: none;
+    }
+    .search-box{
+        margin-top: 60px;
+        height: 15px;
+    }
+
 }
 
 @media (max-width: 480px) {
     .logo-img {
         height: 20px;
     }
-
+    .logo-text{
+        display: none;
+    }
+    .carousel {
+        display: none;
+    }
+    
     .user-avatar {
         width: 30px;
         height: 30px;
@@ -533,6 +550,9 @@ body {
         padding: 8px;
     }
 
+    .header-container{
+        margin: 0 auto;
+    }
     .donate-container {
         max-width: 95%;
         padding: 10px;
@@ -555,10 +575,14 @@ body {
         height: 10px;
         width: 10px;
     }
-
-    .prev, .next {
-        padding: 8px;
+    .n{
+        margin-left: -300px;
     }
+    .search-box{
+        margin-top: 60px;
+        height: 15px;
+    }
+
 }
 .form-container {
     max-width: 600px;
@@ -780,52 +804,4 @@ form button:hover {
     font-weight: bold;
     margin-top: 10px;
     color: #007BFF;
-}
-@media (max-width: 768px) {
-    .container {
-        width: 90%;
-        padding: 10px;
-    }
-
-    .profile-avatar {
-        width: 80px;
-        height: 80px;
-        margin-bottom: 10px;
-    }
-
-    .btn-secondary {
-        width: 100%;
-        padding: 12px;
-        font-size: 16px;
-    }
-
-    .flex-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
-    }
-
-    h1, h2, h3 {
-        text-align: center;
-        font-size: 1.2em;
-    }
-
-    .navbar {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-
-    .navbar a {
-        padding: 10px;
-        display: block;
-        width: 100%;
-    }
-
-    .card {
-        width: 100%;
-        padding: 15px;
-    }
 }

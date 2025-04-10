@@ -1347,4 +1347,4 @@ if __name__ == '__main__':
     checker_thread = Thread(target=campaign_checker)
     checker_thread.daemon = True
     checker_thread.start()
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
