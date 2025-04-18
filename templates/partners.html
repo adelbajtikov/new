@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alterra - Наши партнеры</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #714C8D;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .title {
+            margin-top: 100px;
+            font-size: 36px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .partners-container {
+            margin-top: 40px;
+            width: 90%;
+            max-width: 1000px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            padding: 40px;
+            background-color: #714C8D;
+            border-radius: 30px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .card {
+            background-color: #6a1b9a;
+            border-radius: 25px;
+            overflow: hidden;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+            position: relative;
+            color: white;
+            text-decoration: none;
+        }
+        .img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card h2 {
+            margin: 0 0 10px;
+            font-size: 24px;
+        }
+
+        .card p {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #ccc;
+        }
+        .logoskd{
+            position: absolute;
+            height: 150px;
+            top: 200px;
+        }
+        @media (max-width: 480px) {
+    .logo-img {
+        height: 20px;
+    }
+    .logoskd{
+        height: 100px;
+        top: 100px;
+    }
+    .logo-text{
+        display: none;
+    }
+    .carousel {
+        display: none;
+    }
+    
+    .user-avatar {
+        width: 30px;
+        height: 30px;
+    }
+
+    .campaign {
+        width: 100%;
+        margin: 10px auto;
+    }
+
+    .campaign h2 {
+        font-size: 14px;
+    }
+
+    .progress-bar {
+        width: 100%;
+    }
+
+    .campaign button {
+        width: 100%;
+        padding: 8px;
+    }
+
+    .header-container{
+        margin: 0 auto;
+    }
+    .donate-container {
+        max-width: 95%;
+        padding: 10px;
+    }
+
+    .footer {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer-info {
+        margin-top: 15px;
+    }
+
+    .dots {
+        bottom: 10px;
+    }
+
+    .dot {
+        height: 10px;
+        width: 10px;
+    }
+    .n{
+        margin-left: -300px;
+    }
+    .search-box{
+        margin-top: 60px;
+        height: 15px;
+    }
+
+}
+    </style>
+</head>
+<body>
+    {% include 'header.html' %}
+
+    <h3 class="title">Наши партнёры</h3>
+
+    <div class="partners-container">
+        <a href="{{ url_for('skd_info') }}">
+            <div class="card">
+                <img src="/static/images/skd.png" class = 'img' alt="Help the children - SKD">
+                <img src="/static/images/skdlogo.png" class='logoskd' alt="Help the children - SKD logo">
+                <div class="card-content">
+                    <h2>Help the children – SKD</h2>
+                    <p>
+                        Общественный Благотворительный Фонд «Help the Children – SKD» оказывает помощь детям, страдающих онкологическими, гематологическими и иммунологическими заболеваниями и их семьям.
+    
+                    </p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    {% include 'footer.html' %}
+</body>
+</html>

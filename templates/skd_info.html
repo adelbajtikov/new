@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Help the Children SKD</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      background-color: #714C8D;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+  
+    .container {
+      margin-top: 100px;
+      width: 90%;
+      max-width: 1200px;
+      background: white;
+      border-radius: 30px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+  
+    h2 {
+      color: black;
+    }
+  
+    a {
+      color: #4CAF50;
+    }
+  
+    .back {
+      display: block;
+      margin-top: 40px;
+      text-align: center;
+    }
+  
+    .img-container {
+      display: flex;
+      width: 100%;
+      background-color: green;
+      border-radius: 30px 30px 0 0;
+      position: relative;
+      overflow: hidden;
+    }
+  
+    .skd {
+      width: 100%;
+      object-fit: cover;
+      display: block;
+    }
+  
+    .skdlogo {
+      position: absolute;
+      height: 250px;
+      top: 20px;
+      left: 20px;
+      z-index: 2;
+    }
+  
+    .content-container {
+      padding: 20px 40px;
+    }
+  
+    /* 🔁 Адаптивность */
+    @media (max-width: 1024px) {
+      .content-container {
+        padding: 20px 30px;
+      }
+  
+      .skdlogo {
+        height: 180px;
+        top: 15px;
+        left: 15px;
+      }
+    }
+  
+    @media (max-width: 768px) {
+      .content-container {
+        padding: 20px;
+      }
+  
+      .skdlogo {
+        height: 150px;
+      }
+    }
+  
+    @media (max-width: 480px) {
+      .container {
+        margin-top: 100px;
+        border-radius: 20px;
+      }
+  
+      .skdlogo {
+        height: 120px;
+        top: 10px;
+        left: 10px;
+      }
+  
+      .content-container {
+        padding: 15px;
+        font-size: 15px;
+      }
+  
+      h2 {
+        font-size: 20px;
+      }
+  
+      p {
+        font-size: 14px;
+      }
+    }
+  </style>
+  
+</head>
+<body>
+    {% include 'header.html' %}
+
+    <div class="container">
+        <div class="img-container">
+            <img src="/static/images/skd.png" class="skd" alt="">
+            <img src="/static/images/skdlogo.png" class="skdlogo" alt="">            
+        </div>
+        <div class="content-container">
+            <h2>О фонде</h2>
+            <p>
+                <strong>Общественный Благотворительный Фонд «Help the Children – SKD» оказывает помощь детям, страдающих онкологическими, гематологическими и иммунологическими заболеваниями и их семьям.</strong>
+            </p>
+            <hr>
+            <br>
+            <p>
+                C 2007 года мы  вместе с вами помогаем спасать детские жизни, создавать уют и комфорт в отделениях, помогаем облегчить боль и вселять надежду и веру в сердца людей! 
+            </p>
+
+            <br>
+            <p>
+                Не оставляем в стороне мы и наших докторов. Наша задача постараться помочь в создании максимально комфортных условий работы.
+            </p>
+
+            <br>
+
+            <p>
+                И хоть мы не врачи, но любовь и забота, доброта и внимание, по словам наших докторов, могут творить чудеса.
+            </p>
+
+            <br>
+            <p>
+                Все это мы делаем благодаря вам, нашим партнерам, друзьям и «случайным прохожим»! Низкий вам поклон и слова искренней благодарности за понимание и оказываемую помощь!
+            </p>
+            <br>
+            <p>
+                Перевести в точную сумму не представляется возможным всё, что было сделано и передано детям, т.к. многое передавалось без указания сумм и по себестоимости. Но, можем сказать, что больше, чем за 14 лет было оказано помощи на сумму (на 28.12.2022г)  205 495 873 сом.
+            </p>
+
+            <strong>Страница: </strong><a href="https://www.deti.kg/">Help the children - SKD</a>
+    
+            <h2>Контакты</h2>
+            <p>
+                Кыргызская Республика, г. Бишкек <br>
+                4 мкр., ул. Каралаева, 26\1, офис 2 <br>
+                Телефон:+996 509 103-103 <br>
+                ЭЛСОМ: +996 508 103-103 <br>
+                e-mail: detiskd@gmail.com <br>
+            </p>
+        </div>
+    </div>
+
+    {% include 'footer.html' %}
+
+</body>
+</html>

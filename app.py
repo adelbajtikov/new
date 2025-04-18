@@ -102,6 +102,16 @@ def leaderboard():
         ).fetchone()
 
     return render_template('leaderboard.html', top_users=top_users, user=user)
+
+
+@app.route('/partners')
+def partners():
+    return render_template('partners.html')
+
+@app.route('/skd_info')
+def skd_info():
+    return render_template('skd_info.html')
+
 @app.route('/update_description', methods=['POST'])
 def update_description():
     if 'user_id' not in session:

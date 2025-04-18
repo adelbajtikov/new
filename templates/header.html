@@ -17,6 +17,7 @@
         <a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Пожертвования</a>
         <a href="{{ url_for('volunteering') }}" class="{% if request.endpoint == 'volunteering' %}active{% endif %}">Волонтёрства</a>
         <a href="{{ url_for('leaderboard') }}" class="{% if request.endpoint == 'leaderboard' %}active{% endif %}">Топ пользователей</a>
+        <a href="{{ url_for('partners') }}" class="{% if request.endpoint == 'partners' %}active{% endif %}">Наши партнеры</a>
       </nav>
   
       <div class="user-profile">
